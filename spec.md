@@ -145,7 +145,7 @@ Ba mức sử dụng: **tự làm / cần người duyệt / cấm**. “Cần n
 |---|---|---|---|
 | Trương Thị Thu Hà | B | Vì ở #5 khách đứng ở quầy viện phí rất gấp, B cho khách tự bấm nhả khi người nhận là đơn vị đã đăng ký nên không phải chờ ai. Cái giá: kẻ lừa có thể bảo nạn nhân trả cho một đơn vị đã đăng ký, như #4 | Đổi sang C: kẽ hở ở #4 làm mất tiền không lấy lại được; ở C khách #5 chỉ chờ khoảng 3 phút và vẫn có đường lui trả bằng thẻ/tiền mặt |
 | Thành viên 2 | [Chờ điền] | [Liên hệ #4 hoặc #5] | [Giữ/đổi ý, vì sao] |
-| Thành viên 3 | [Chờ điền] | [Liên hệ #4 hoặc #5] | [Giữ/đổi ý, vì sao] |
+| Nguyễn Ngọc Quang | A | Vì ở #5 và #11 khách đã xác thực khuôn mặt đúng thì AI nhả ngay, khách không phải chờ tư vấn viên. Cái giá: ở #4 chính nạn nhân cũng xác thực đúng, AI nhả là tiền đi trong vài giây, không lấy lại được | [Đổi sang C: xác thực đúng không chứng minh giao dịch an toàn (#4); C vẫn giảm chờ cho #5 nhờ xác thực trước và hàng ưu tiên] |
 
 Phương án chốt trong thiết kế là **C**. Bảng trên chưa phải biên bản nhóm đã thảo luận; không suy diễn lựa chọn cá nhân từ quyết định chung.
 
