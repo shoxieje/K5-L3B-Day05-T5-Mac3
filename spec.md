@@ -5,7 +5,7 @@
 | Họ và Tên | Mã Học Viên | Việc đã làm |
 |---|---|---|
 | Trương Thị Thu Hà | 2A202603780 | §1 lát cắt & phạm vi, §2 kịch bản rủi ro (viết lại tin nhắn cho giống người thật), §3 khi AI sai, kịch bản demo |
-| [Thành viên 2] | [mã] | §4 mức tự chủ, §6 tiêu chí, soát rubric, ảnh đánh số |
+| Nguyễn Minh Quân | 2A202603794 | §4 mức tự chủ, §6 tiêu chí, soát rubric, ảnh đánh số |
 | Nguyễn Ngọc Quang | 2A202603773 | §5 prototype `prototype/index.html` (màn người dùng + màn tư vấn viên) |
 
 ---
