@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trợ lý ví · Prototype T5 · Mac3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:oklch(0.975 0.004 240);
+  --surface:oklch(0.997 0.002 240);
+  --sunken:oklch(0.955 0.006 240);
+  --line:oklch(0.91 0.008 240);
+  --ink:oklch(0.24 0.02 250);
+  --ink-2:oklch(0.45 0.015 250);
+  --muted:oklch(0.58 0.012 250);
+  --accent:oklch(0.45 0.09 245);
+  --accent-ink:oklch(0.99 0.005 245);
+  --accent-soft:oklch(0.95 0.02 245);
+  --ok:oklch(0.52 0.1 160);  --ok-soft:oklch(0.955 0.025 160);
+  --warn:oklch(0.58 0.12 70); --warn-soft:oklch(0.965 0.03 80);
+  --danger:oklch(0.53 0.16 25); --danger-soft:oklch(0.96 0.02 25);
+  --r-lg:20px; --r:12px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:14px;line-height:1.5;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+[hidden]{display:none!important}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.annot-toggle input:focus-visible{outline-offset:3px}
+h1,h2,h3,p{margin:0}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;height:60px;padding:0 24px;background:color-mix(in oklch,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{font-weight:600;font-size:14px;display:flex;align-items:center;gap:10px}
+.brand small{font-weight:400;color:var(--muted);font-size:13px}
+.seg{display:flex;background:var(--sunken);border-radius:999px;padding:3px}
+.seg button{padding:6px 16px;border-radius:999px;font-size:13px;color:var(--ink-2);font-weight:500;transition:background .2s,color .2s}
+.seg button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px oklch(0.2 0.02 250/.08)}
+.annot-toggle{justify-self:end;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);cursor:pointer;user-select:none;border-radius:999px}
+.annot-toggle input{appearance:none;width:30px;height:18px;border-radius:999px;background:var(--line);position:relative;margin:0;cursor:pointer;transition:background .2s}
+.annot-toggle input::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--surface);transition:transform .2s var(--ease)}
+.annot-toggle input:checked{background:var(--accent)}
+.annot-toggle input:checked::after{transform:translateX(12px)}
+
+/* layout */
+.view{max-width:1180px;margin:0 auto;padding:32px 24px 64px}
+.user-view{display:grid;grid-template-columns:300px 1fr;gap:48px;align-items:start}
+.side{display:flex;flex-direction:column;gap:32px;position:sticky;top:92px}
+.side h2{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px}
+.case-btn{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:var(--r);transition:background .15s}
+.case-btn:hover{background:var(--sunken)}
+.case-btn[aria-pressed="true"]{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+.case-btn b{display:block;font-weight:500;font-size:14px}
+.case-btn span{font-size:12.5px;color:var(--muted)}
+.reset{margin-top:6px;font-size:13px;color:var(--accent);padding:6px 14px;border-radius:8px}
+.reset:hover{background:var(--accent-soft)}
+.tools{list-style:none;margin:0;padding:0}
+.tools li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.tools li:last-child{border-bottom:0}
+.tools code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--muted);display:block}
+.lvl{font-size:12px;font-weight:500;white-space:nowrap;padding:2px 8px;border-radius:999px}
+.lvl.auto{color:var(--ok);background:var(--ok-soft)}
+.lvl.confirm{color:var(--warn);background:var(--warn-soft)}
+.lvl.never{color:var(--danger);background:var(--danger-soft)}
+.legend{display:none;list-style:none;margin:0;padding:0;counter-reset:n}
+body.annot .legend{display:block}
+.legend li{display:grid;grid-template-columns:22px 1fr;gap:10px;font-size:12.5px;padding:8px 0;border-bottom:1px solid var(--line);color:var(--ink-2)}
+.legend li b{display:block;color:var(--ink);font-weight:500}
+.legend .num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:11px;font-weight:600;display:grid;place-items:center}
+.legend-wrap{display:none}
+body.annot .legend-wrap{display:block}
+
+/* phone */
+.stage{display:flex;justify-content:center}
+.phone{position:relative;width:390px;height:780px;background:var(--surface);border-radius:44px;box-shadow:0 0 0 1px var(--line),0 30px 60px -30px oklch(0.25 0.03 250/.25);overflow:clip;display:flex;flex-direction:column}
+.app-bar{display:flex;align-items:center;gap:12px;padding:46px 20px 14px;border-bottom:1px solid var(--line)}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.app-bar b{display:block;font-weight:600;font-size:14.5px}
+.app-bar span{font-size:12px;color:var(--muted)}
+.chat{flex:1;overflow-y:auto;padding:20px 16px 12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.chat>*{flex-shrink:0}
+.composer{border-top:1px solid var(--line);padding:12px 14px 26px}
+.fake-input{height:40px;border-radius:999px;background:var(--sunken);display:flex;align-items:center;padding:0 16px;color:var(--muted);font-size:13px}
+
+.msg{max-width:84%;padding:10px 14px;border-radius:18px;font-size:14px;animation:in .28s var(--ease) both}
+.msg.ai{align-self:flex-start;background:var(--sunken);border-bottom-left-radius:6px}
+.msg.user{align-self:flex-end;background:var(--ink);color:var(--surface);border-bottom-right-radius:6px}
+.msg.ai.alert .alert-title{color:var(--danger);font-weight:600;margin-bottom:4px;display:flex;gap:6px;align-items:flex-start}
+.msg.ai.alert .alert-title svg{flex:none;margin-top:3px}
+.sys{align-self:center;font-size:12px;color:var(--muted);text-align:center;max-width:90%;animation:in .28s var(--ease) both}
+.sys.done{color:var(--ok);font-weight:500}
+.typing{align-self:flex-start;background:var(--sunken);border-radius:18px;border-bottom-left-radius:6px;padding:12px 14px;display:flex;gap:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+
+.ev{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.ev-head{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.tag{font-size:11.5px;font-weight:500;padding:2px 8px;border-radius:999px}
+.tag.danger{color:var(--danger);background:var(--danger-soft)}
+.tag.ok{color:var(--ok);background:var(--ok-soft)}
+.tag.warn{color:var(--warn);background:var(--warn-soft)}
+.tag.neutral{color:var(--ink-2);background:var(--sunken)}
+.ev ul{margin:6px 0 0;padding:0;list-style:none;font-size:13px}
+.ev li{padding:2px 0 2px 14px;position:relative}
+.ev li::before{content:"";position:absolute;left:2px;top:10px;width:4px;height:4px;border-radius:50%;background:var(--muted)}
+.ev .foot{font-size:12px;color:var(--muted);margin-top:6px}
+
+.card{align-self:stretch;border-radius:16px;box-shadow:inset 0 0 0 1px var(--line);background:var(--surface);padding:14px 16px;animation:in .28s var(--ease) both}
+.hold-card .row{display:flex;justify-content:space-between;align-items:center}
+.hold-card .amt{font-size:22px;font-weight:600;letter-spacing:-.01em;margin:6px 0 2px}
+.hold-card .to{font-size:13px;color:var(--ink-2)}
+.hold-card .safe{display:flex;gap:6px;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-2)}
+
+.chip{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2);padding:6px 10px 6px 8px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line);animation:in .28s var(--ease) both}
+.chip .dot{width:16px;height:16px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center}
+.chip em{font-style:normal;color:var(--muted)}
+
+.btn{height:40px;padding:0 16px;border-radius:999px;font-weight:500;font-size:13.5px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,transform .1s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{background:color-mix(in oklch,var(--accent) 88%,black)}
+.btn.ghost{box-shadow:inset 0 0 0 1px var(--line);background:var(--surface)}
+.btn.ghost:hover{background:var(--sunken)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn[disabled]{background:var(--sunken);color:var(--muted);cursor:not-allowed;box-shadow:none}
+.btn.block{width:100%}
+
+.choices{display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-top:6px}
+.choice{text-align:left;max-width:92%;padding:9px 14px;border-radius:18px;font-size:13.5px;box-shadow:inset 0 0 0 1px var(--accent);color:var(--accent);background:var(--surface);transition:background .15s;animation:in .28s var(--ease) both}
+.choice:hover{background:var(--accent-soft)}
+.choice-hint{font-size:11.5px;color:var(--muted);text-align:right}
+
+.verify .face{width:56px;height:56px;margin:4px auto 10px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);position:relative}
+.verify.scanning .face::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--accent);border-right-color:transparent;animation:spin .9s linear infinite}
+.verify.ok .face{background:var(--ok-soft);color:var(--ok)}
+.verify p{text-align:center;font-size:13px;color:var(--ink-2);margin-bottom:12px}
+.verify b{display:block;text-align:center;font-weight:600;margin-bottom:2px}
+
+.tracker ol{list-style:none;margin:0;padding:0}
+.tracker li{display:grid;grid-template-columns:18px 1fr;gap:10px;font-size:13px;color:var(--muted);position:relative;padding-bottom:12px}
+.tracker li:last-child{padding-bottom:0}
+.tracker li::before{content:"";position:absolute;left:8px;top:16px;bottom:-2px;width:1px;background:var(--line)}
+.tracker li:last-child::before{display:none}
+.tracker .bullet{width:17px;height:17px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--line);background:var(--surface);display:grid;place-items:center;margin-top:1px;z-index:1}
+.tracker li.done{color:var(--ink)}
+.tracker li.done .bullet{background:var(--ok);box-shadow:none;color:#fff}
+.tracker li.now{color:var(--ink);font-weight:500}
+.tracker li.now .bullet{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.tracker li.now .bullet::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.4s infinite}
+.tracker .meta{font-size:12px;color:var(--muted);margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.link-btn{align-self:center;font-size:12.5px;color:var(--accent);padding:6px 10px;border-radius:8px}
+.link-btn:hover{background:var(--accent-soft)}
+
+/* bottom sheet inside phone */
+.scrim{position:absolute;inset:0;background:oklch(0.2 0.02 250/.32);opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:28px 28px 44px 44px;padding:12px 24px 30px;transform:translateY(105%);transition:transform .32s var(--ease)}
+.scrim.open .sheet{transform:none}
+.grab{width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 18px}
+.sheet h3{font-size:18px;font-weight:600;margin-bottom:6px}
+.sheet p{color:var(--ink-2);font-size:13.5px;margin-bottom:6px}
+.sheet .who{font-size:12px;color:var(--muted);margin:10px 0 18px}
+.sheet .actions{display:flex;flex-direction:column;gap:8px}
+
+/* agent console */
+.agent-view{display:grid;grid-template-columns:280px 1fr;gap:40px;align-items:start}
+.queue h2,.panel-title{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px}
+.q-item{display:block;width:100%;text-align:left;padding:14px;border-radius:var(--r);transition:background .15s}
+.q-item:hover{background:var(--sunken)}
+.q-item[aria-pressed="true"]{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+.q-item .r1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.q-item b{font-weight:500}
+.q-item .r2{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:4px}
+.detail{display:flex;flex-direction:column;gap:28px;min-width:0}
+.d-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.d-head h1{font-size:22px;font-weight:600;letter-spacing:-.01em}
+.d-head .sub{color:var(--ink-2);font-size:13.5px;margin-top:2px}
+.d-amt{text-align:right}
+.d-amt .v{font-size:22px;font-weight:600;letter-spacing:-.01em}
+.d-amt .s{font-size:12.5px;color:var(--muted)}
+.d-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}
+.panel{background:var(--surface);border-radius:var(--r-lg);box-shadow:inset 0 0 0 1px var(--line);padding:20px}
+.ai-read{display:flex;flex-direction:column;gap:14px}
+.ai-read .label{display:flex;align-items:center;gap:8px}
+.ai-read .label strong{font-size:16px;font-weight:600}
+.summary{color:var(--ink-2);font-size:13.5px}
+.evid{list-style:none;margin:0;padding:0}
+.evid li{display:grid;grid-template-columns:76px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.evid li span{color:var(--muted);font-size:12px}
+.rec{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--accent-soft);border-radius:var(--r);padding:12px 14px;font-size:13px}
+.rec b{font-weight:600;color:var(--accent)}
+.rec button{font-size:12.5px;color:var(--accent);white-space:nowrap;padding:4px 8px;border-radius:6px}
+.rec button:hover{background:var(--surface)}
+.checks{list-style:none;margin:0 0 18px;padding:0}
+.checks label{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px;cursor:pointer}
+.checks li:first-child label{border-top:0}
+.checks input{appearance:none;flex:none;width:18px;height:18px;border-radius:6px;box-shadow:inset 0 0 0 1.5px var(--line);margin:1px 0 0;display:grid;place-items:center;cursor:pointer;background:var(--surface)}
+.checks input:checked{background:var(--ink);box-shadow:none}
+.checks input:checked::after{content:"";width:9px;height:5px;border:2px solid var(--surface);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.checks input:disabled{cursor:default}
+.checks small{display:block;color:var(--muted);font-size:12px}
+.decide{display:flex;gap:8px;flex-wrap:wrap}
+.decide .btn{flex:1}
+.wait{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.wait .late{color:var(--danger);font-weight:500}
+.final{border-radius:var(--r);padding:14px;font-size:13.5px;background:var(--sunken);color:var(--ink-2)}
+.final b{color:var(--ink);font-weight:600;display:block;margin-bottom:2px}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;background:oklch(0.2 0.02 250/.35);display:grid;place-items:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal.open{opacity:1;pointer-events:auto}
+.modal-box{width:min(420px,100%);background:var(--surface);border-radius:var(--r-lg);padding:24px;transform:translateY(8px) scale(.98);transition:transform .25s var(--ease)}
+.modal.open .modal-box{transform:none}
+.modal-box h3{font-size:18px;font-weight:600;margin-bottom:8px}
+.modal-box p{color:var(--ink-2);font-size:13.5px;margin-bottom:6px}
+.modal-box .warnline{color:var(--danger);font-weight:500}
+.modal-box .actions{display:flex;gap:8px;margin-top:20px}
+.modal-box .actions .btn{flex:1}
+
+/* annotation badges */
+body.annot [data-n]{position:relative}
+body.annot [data-n]::after{content:attr(data-n);position:absolute;top:-8px;left:-8px;z-index:5;width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:600 11px/20px "Be Vietnam Pro",sans-serif;text-align:center;box-shadow:0 0 0 2px var(--surface)}
+
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+@media (max-width:900px){
+  .top{grid-template-columns:1fr auto;height:auto;padding:12px 16px;row-gap:10px}
+  .brand{grid-column:1/-1}
+  .seg{justify-self:start}
+  .view{padding:24px 16px 48px}
+  .user-view,.agent-view{grid-template-columns:1fr;gap:28px}
+  .side{position:static;order:2}
+  .d-grid{grid-template-columns:1fr}
+}
+@media (max-width:430px){
+  .phone{width:100%;height:720px;border-radius:32px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">Trợ lý ví <small>Prototype T5 · nhóm Mac3</small></div>
+  <div class="seg" role="tablist">
+    <button role="tab" data-view="user" aria-selected="true">Người dùng</button>
+    <button role="tab" data-view="agent" aria-selected="false">Tư vấn viên</button>
+  </div>
+  <label class="annot-toggle"><input type="checkbox" id="annot"> Đánh số</label>
+</header>
+
+<main>
+  <section class="view user-view" id="view-user">
+    <aside class="side">
+      <div>
+        <h2>Ca</h2>
+        <div id="case-list"></div>
+        <button class="reset" id="reset">Chạy lại từ đầu</button>
+      </div>
+      <div>
+        <h2>Ai được làm gì</h2>
+        <ul class="tools" id="tools" data-n="7"></ul>
+      </div>
+      <div class="legend-wrap">
+        <h2>Chú thích</h2>
+        <ul class="legend" id="legend-user"></ul>
+      </div>
+    </aside>
+
+    <div class="stage">
+      <div class="phone">
+        <div class="app-bar">
+          <div class="avatar" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z"/></svg></div>
+          <div><b>Chat với ví</b><span>Trợ lý trả lời 24/7 · tư vấn viên 8h-20h</span></div>
+        </div>
+        <div class="chat" id="chat" aria-live="polite"></div>
+        <div class="composer" id="composer"></div>
+        <div class="scrim" id="scrim">
+          <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" data-n="5">
+            <div class="grab"></div>
+            <h3 id="sheet-title">Khoá toàn bộ ví?</h3>
+            <p>Mọi giao dịch, kể cả nạp và rút, sẽ dừng ngay.</p>
+            <p>Mở lại phải gọi tổng đài và có thể mất vài giờ.</p>
+            <div class="who">Chỉ bạn quyết định việc này. Trợ lý không tự khoá ví.</div>
+            <div class="actions">
+              <button class="btn danger block" id="lock-yes">Khoá ví</button>
+              <button class="btn ghost block" id="lock-no">Để sau</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view agent-view" id="view-agent" hidden>
+    <aside class="queue">
+      <h2>Hàng chờ duyệt</h2>
+      <div id="queue"></div>
+      <div class="legend-wrap" style="margin-top:28px">
+        <h2>Chú thích</h2>
+        <ul class="legend" id="legend-agent"></ul>
+      </div>
+    </aside>
+    <div class="detail" id="detail"></div>
+  </section>
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-box" data-n="11">
+    <h3 id="modal-title"></h3>
+    <p id="modal-body"></p>
+    <p class="warnline">Tiền đi trong vài giây và không thu hồi được.</p>
+    <div class="actions">
+      <button class="btn ghost" id="modal-no">Quay lại</button>
+      <button class="btn primary" id="modal-yes">Nhả giao dịch</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIG: chỉnh câu chữ (§3), mức tự chủ (§4) và chú thích HAX/PAIR (§5)
+   ở đây. Không cần sửa phần giao diện bên dưới.
+   ===================================================================== */
+const CONFIG = {
+  slaMinutes: 3, // quá hạn này mà tư vấn viên chưa duyệt thì gọi lại khách
+
+  levels: { auto: 'AI tự làm', confirm: 'Khách xác nhận', never: 'AI không làm' },
+  tools: [
+    { id: 'giu_giao_dich',      name: 'Giữ giao dịch',       level: 'auto' },
+    { id: 'yeu_cau_xac_minh',   name: 'Gửi bước xác thực',   level: 'auto' },
+    { id: 'chuyen_tu_van_vien', name: 'Chuyển tư vấn viên',  level: 'auto' },
+    { id: 'khoa_vi',            name: 'Khoá ví',             level: 'confirm' },
+    { id: 'nha_giao_dich',      name: 'Nhả giao dịch',       level: 'never', note: 'Chỉ tư vấn viên' },
+  ],
+
+  cases: {
+    c4: {
+      title: 'Bị giục chuyển tiền', sub: 'Ca #4 · người dùng lớn tuổi',
+      name: 'Trần Thị Lan', amount: 48500000, to: 'NGUYEN VAN HUNG', toSub: 'Tài khoản ngân hàng •••• 2291', time: '21:14',
+      tag: 'Nghi lừa đảo', tone: 'danger',
+      summary: 'Khách lớn tuổi bị gọi điện giả danh công an, đòi nhả 48,5 triệu để "xác minh hồ sơ". Khách đã xác thực khuôn mặt đúng.',
+      evidence: [
+        { src: 'Khách nói', text: '“Công an gọi bảo phải chuyển tiền xác minh hồ sơ”' },
+        { src: 'Khách nói', text: '“trong 15 phút, không thì liên quan vụ án”' },
+        { src: 'Khách nói', text: '“tôi đã xác thực khuôn mặt rồi”' },
+        { src: 'Hệ thống',  text: 'Lần đầu khách chuyển tiền cho người nhận này' },
+      ],
+      rec: 'Giữ tiếp và gọi lại khách. Lời khách kể giống kịch bản giả danh công an.',
+      checks: [
+        { id: 'call',  text: 'Đã gọi lại khách qua số đã đăng ký' },
+        { id: 'alone', text: 'Khách xác nhận không có ai đang hướng dẫn qua điện thoại' },
+        { id: 'know',  text: 'Khách biết rõ người nhận ngoài đời' },
+      ],
+      steps: ['Giao dịch đang giữ', 'Đã chuyển tư vấn viên', 'Tư vấn viên gọi lại cho bạn', 'Kết quả'],
+      stepOf: { held: 0, review: 2, released: 4, kept: 4, locked: 4 },
+      notify: {
+        released: 'Tư vấn viên đã nhả giao dịch sau khi gọi xác minh với bạn.',
+        kept: 'Tư vấn viên quyết định tiếp tục giữ giao dịch. Tiền vẫn ở trong ví. Tư vấn viên sẽ gọi bạn qua số đã đăng ký.',
+      },
+      script: {
+        start: [
+          { t: 'card' },
+          { t: 'ai', text: 'Chào bạn, mình là trợ lý của ví. Giao dịch 48.500.000 ₫ đang được tạm giữ và tiền vẫn nằm trong ví của bạn. Bạn cần mình giúp gì?' },
+          { t: 'choices', items: [
+            { say: 'Nhả giao dịch giúp tôi. Công an gọi bảo phải chuyển tiền xác minh hồ sơ trong 15 phút, không thì tôi liên quan vụ án.', go: 'claim' },
+          ] },
+        ],
+        claim: [
+          { t: 'ai', n: 2, alert: 'Bạn hãy dừng lại, đừng chuyển tiền lúc này.',
+            text: 'Công an và toà án không yêu cầu ai chuyển tiền qua ví để "xác minh hồ sơ". Đây là cách kẻ gian thường dùng. Tiền của bạn vẫn đang an toàn trong ví.',
+            evidence: { label: 'Nghi lừa đảo', tone: 'danger', quote: true, why: ['công an gọi', 'xác minh hồ sơ', 'trong 15 phút'], foot: 'Mình chỉ dựa vào những gì bạn vừa kể.' } },
+          { t: 'action', n: 3, tool: 'chuyen_tu_van_vien', label: 'Đã chuyển bạn tới tư vấn viên, hàng ưu tiên' },
+          { t: 'status', set: 'review' },
+          { t: 'tracker', n: 6 },
+          { t: 'choices', items: [
+            { say: 'Nhưng tôi đã xác thực khuôn mặt rồi mà, sao vẫn chặn?', go: 'face' },
+            { say: 'Khoá ví giúp tôi', go: 'lock' },
+            { say: 'Được, tôi chờ tư vấn viên', go: 'after' },
+          ] },
+        ],
+        face: [
+          { t: 'ai', text: 'Xác thực khuôn mặt chỉ cho biết chính bạn đang bấm. Nó không cho biết người nhận có đáng tin hay không.' },
+          { t: 'ai', n: 4, text: 'Mình không nhả được giao dịch này. Chỉ tư vấn viên quyết định, sau khi nói chuyện trực tiếp với bạn.' },
+          { t: 'choices', items: [
+            { say: 'Khoá ví giúp tôi', go: 'lock' },
+            { say: 'Được, tôi chờ tư vấn viên', go: 'after' },
+          ] },
+        ],
+        lock: [
+          { t: 'ai', text: 'Bạn xác nhận ở bên dưới nhé. Khoá ví sẽ dừng mọi giao dịch.' },
+          { t: 'sheet' },
+        ],
+        locked: [
+          { t: 'action', tool: 'khoa_vi', label: 'Ví đã khoá theo xác nhận của bạn', by: 'Bạn xác nhận' },
+          { t: 'status', set: 'locked' },
+          { t: 'ai', text: 'Ví đã khoá, không ai chuyển được tiền ra. Tư vấn viên vẫn sẽ gọi bạn qua số đã đăng ký để mở lại khi an toàn.' },
+          { t: 'goto', to: 'after' },
+        ],
+        nolock: [
+          { t: 'ai', text: 'Không sao, ví vẫn mở. Giao dịch kia vẫn đang giữ, tiền chưa đi đâu cả.' },
+          { t: 'goto', to: 'after' },
+        ],
+        after: [
+          { t: 'ai', text: 'Trong lúc chờ, đừng chuyển tiền bằng cách khác và đừng làm theo người đang gọi cho bạn. Tư vấn viên của ví chỉ gọi từ số đã đăng ký và không bao giờ hỏi mã OTP.' },
+          { t: 'hint' },
+        ],
+      },
+    },
+
+    c5: {
+      title: 'Đang ở quầy viện phí', sub: 'Ca #5 · khách gấp thật',
+      name: 'Lê Minh Tuấn', amount: 12800000, to: 'BV ĐA KHOA TÂM AN', toSub: 'Đơn vị đã đăng ký thanh toán', time: '09:42',
+      tag: 'Gấp thật', tone: 'warn',
+      summary: 'Khách đang ở quầy viện phí, cần thanh toán ngay. Người nhận là bệnh viện đã đăng ký với ví.',
+      evidence: [
+        { src: 'Khách nói', text: '“đang đứng ở quầy viện phí, người ta đợi sau lưng”' },
+        { src: 'Hệ thống',  text: 'Người nhận là đơn vị đã đăng ký thanh toán' },
+        { src: 'Hệ thống',  text: 'Xác thực khuôn mặt', dyn: 'face' },
+      ],
+      rec: 'Có thể nhả khi đủ ba kiểm tra.',
+      checks: [
+        { id: 'face',     text: 'Khách đã xác thực khuôn mặt', auto: 'verified', hint: 'Hệ thống tự đánh dấu' },
+        { id: 'merchant', text: 'Người nhận là đơn vị đã đăng ký', auto: true, hint: 'Hệ thống tự đánh dấu' },
+        { id: 'amount',   text: 'Số tiền khớp với khoản viện phí khách mô tả' },
+      ],
+      steps: ['Thanh toán đang giữ', 'Bạn đã xác thực', 'Tư vấn viên đang duyệt', 'Đã chuyển tiền'],
+      stepOf: { held: 0, verified: 1, review: 2, released: 4, kept: 4 },
+      notify: {
+        released: 'Đã chuyển 12.800.000 ₫ tới BV Đa khoa Tâm An. Bạn có thể đưa màn hình này cho quầy.',
+        kept: 'Tư vấn viên cần kiểm tra thêm nên vẫn giữ khoản này. Tiền vẫn ở trong ví, bạn có thể trả bằng cách khác tại quầy.',
+      },
+      script: {
+        start: [
+          { t: 'card' },
+          { t: 'ai', text: 'Chào bạn, mình là trợ lý của ví. Khoản thanh toán 12.800.000 ₫ đang chờ xác nhận và tiền vẫn nằm trong ví. Bạn cần mình giúp gì?' },
+          { t: 'choices', items: [
+            { say: 'Tôi đang đứng ở quầy viện phí, người ta đợi sau lưng mà app bảo chờ xác nhận. Bấm vào đâu để đi tiếp?', go: 'urgent' },
+          ] },
+        ],
+        urgent: [
+          { t: 'ai', text: 'Bạn bấm "Xác thực ngay" bên dưới, mất khoảng 30 giây.' },
+          { t: 'action', tool: 'yeu_cau_xac_minh', label: 'Đã gửi bước xác thực khuôn mặt' },
+          { t: 'verify' },
+        ],
+        verified: [
+          { t: 'status', set: 'review' },
+          { t: 'ai', text: 'Xác thực xong. Mình đã gửi khoản này cho tư vấn viên duyệt ưu tiên, kèm kết quả xác thực.',
+            evidence: { label: 'Có vẻ là thanh toán thật', tone: 'ok', why: ['Người nhận là bệnh viện đã đăng ký với ví', 'Bạn vừa xác thực khuôn mặt'], foot: 'Mình không tự nhả được. Tư vấn viên sẽ bấm.' } },
+          { t: 'action', tool: 'chuyen_tu_van_vien', label: 'Đã chuyển tư vấn viên duyệt, hàng ưu tiên' },
+          { t: 'tracker' },
+          { t: 'choices', items: [ { say: 'Nếu lâu quá thì sao?', go: 'slow' } ] },
+        ],
+        slow: [
+          { t: 'ai', text: 'Quá 3 phút chưa duyệt, tư vấn viên sẽ gọi bạn. Nếu cần trả ngay, bạn có thể dùng thẻ hoặc tiền mặt tại quầy. Khoản này vẫn đang giữ nên bạn không bị trừ tiền hai lần.' },
+          { t: 'hint' },
+        ],
+      },
+    },
+  },
+
+  // Chú thích cho ảnh đánh số (§5). Bản nháp: chỉnh theo §3/§4 của nhóm.
+  notes: {
+    user: [
+      { n: 1, what: 'Thẻ giao dịch đang giữ, ghi rõ "tiền chưa rời ví"', why: 'HAX G1 · giu_giao_dich: AI tự làm' },
+      { n: 2, what: 'Câu đầu là lời bảo dừng lại, kèm lý do lấy từ lời khách', why: 'HAX G11 · PAIR Explainability. Không lộ cách phát hiện gian lận' },
+      { n: 3, what: 'Mỗi hành động AI đã làm có nhãn mức tự chủ', why: 'PAIR Mental models · chuyen_tu_van_vien: AI tự làm' },
+      { n: 4, what: 'Không có nút nhả trong chat, chỉ có đường tới người', why: 'HAX G10 · nha_giao_dich: AI không làm' },
+      { n: 5, what: 'Khoá ví cần khách xác nhận, nói rõ hậu quả', why: 'HAX G16 · khoa_vi: khách xác nhận' },
+      { n: 6, what: 'Tiến trình và hạn chờ, khách biết bước tiếp theo', why: 'PAIR Errors + Graceful failure' },
+      { n: 7, what: 'Bảng mức tự chủ khớp §4', why: 'Đối chiếu khi demo' },
+    ],
+    agent: [
+      { n: 8, what: 'Phân loại của AI kèm bằng chứng có nguồn', why: 'HAX G11 · PAIR Explainability + Trust' },
+      { n: 9, what: 'Đề xuất của AI bỏ qua được bằng một lần bấm', why: 'HAX G8' },
+      { n: 10, what: 'Nút nhả khoá cho tới khi đủ kiểm tra', why: 'nha_giao_dich: tư vấn viên duyệt' },
+      { n: 11, what: 'Xác nhận cuối, nói rõ không hoàn tác', why: 'HAX G16' },
+    ],
+  },
+};
+
+/* =====================================================================
+   Giao diện
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const fmt = n => n.toLocaleString('vi-VN') + ' ₫';
+const sleep = ms => new Promise(r => setTimeout(r, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : ms));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const ICON = {
+  check: '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  shield: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z"/></svg>',
+  stop: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/></svg>',
+  face: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2"/><path d="M9 10v1M15 10v1M9.5 15.5c1.4 1 3.6 1 5 0"/></svg>',
+};
+
+const S = {
+  view: 'user', caseId: 'c4', agentCase: 'c4', run: 0,
+  status: { c4: 'held', c5: 'held' },
+  checks: { c4: {}, c5: {} },
+  recHidden: { c4: false, c5: false },
+  waitFrom: {},
+  decidedAt: {},
+};
+const FINAL = ['released', 'kept', 'locked'];
+const toolLevel = id => CONFIG.tools.find(t => t.id === id).level;
+
+/* ---------- view switching ---------- */
+function setView(v) {
+  S.view = v;
+  document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-selected', b.dataset.view === v));
+  $('#view-user').hidden = v !== 'user';
+  $('#view-agent').hidden = v !== 'agent';
+  if (v === 'agent') { S.agentCase = S.caseId; renderAgent(); }
+  else chat.scrollTop = chat.scrollHeight;
+  window.scrollTo({ top: 0 });
+}
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => setView(b.dataset.view));
+$('#annot').onchange = e => document.body.classList.toggle('annot', e.target.checked);
+
+/* ---------- static side panels ---------- */
+function renderSide() {
+  $('#case-list').innerHTML = Object.entries(CONFIG.cases).map(([id, c]) =>
+    `<button class="case-btn" data-case="${id}" aria-pressed="${id === S.caseId}"><b>${esc(c.title)}</b><span>${esc(c.sub)}</span></button>`).join('');
+  document.querySelectorAll('.case-btn').forEach(b => b.onclick = () => startCase(b.dataset.case));
+  $('#tools').innerHTML = CONFIG.tools.map(t =>
+    `<li><div>${esc(t.name)}<code>${t.id}</code></div><span class="lvl ${t.level}">${esc(t.note || CONFIG.levels[t.level])}</span></li>`).join('');
+  const leg = arr => arr.map(x => `<li><span class="num">${x.n}</span><div><b>${esc(x.what)}</b>${esc(x.why)}</div></li>`).join('');
+  $('#legend-user').innerHTML = leg(CONFIG.notes.user);
+  $('#legend-agent').innerHTML = leg(CONFIG.notes.agent);
+}
+
+/* ---------- chat engine ---------- */
+const chat = $('#chat'), composer = $('#composer');
+const add = el => { chat.appendChild(el); chat.scrollTop = chat.scrollHeight; return el; };
+const node = (cls, html, n) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html; if (n) d.dataset.n = n; return d; };
+const idleComposer = () => { composer.innerHTML = '<div class="fake-input">Nhắn cho trợ lý…</div>'; };
+
+function resetCase(id) {
+  S.status[id] = 'held'; S.checks[id] = {}; S.recHidden[id] = false;
+  delete S.waitFrom[id]; delete S.decidedAt[id];
+}
+function startCase(id) {
+  S.caseId = id; S.run++;
+  resetCase(id);
+  chat.innerHTML = ''; idleComposer(); closeSheet();
+  renderSide();
+  play('start');
+}
+$('#reset').onclick = () => startCase(S.caseId);
+
+async function play(seq) {
+  const run = S.run, c = CONFIG.cases[S.caseId];
+  for (const step of c.script[seq]) {
+    if (run !== S.run) return;
+    switch (step.t) {
+      case 'card': add(holdCard(c)); await sleep(500); break;
+      case 'ai': {
+        const typing = add(node('typing', '<i></i><i></i><i></i>'));
+        await sleep(650 + Math.min(step.text.length * 6, 700));
+        typing.remove(); if (run !== S.run) return;
+        add(aiMsg(step)); await sleep(300); break;
+      }
+      case 'action': {
+        const lvl = toolLevel(step.tool);
+        add(node('chip', `<span class="dot">${ICON.check}</span>${esc(step.label)} <em>· ${esc(step.by || CONFIG.levels[lvl])}</em>`, step.n));
+        await sleep(350); break;
+      }
+      case 'status': setStatus(S.caseId, step.set); break;
+      case 'tracker': add(trackerEl(S.caseId, step.n)); await sleep(300); break;
+      case 'verify': add(verifyEl()); break;
+      case 'sheet': openSheet(); break;
+      case 'hint': {
+        const b = add(node('link-btn', 'Xem phía tư vấn viên →'));
+        b.setAttribute('role', 'button'); b.tabIndex = 0;
+        b.onclick = () => setView('agent');
+        b.onkeydown = e => { if (e.key === 'Enter') setView('agent'); };
+        break;
+      }
+      case 'choices': showChoices(step.items); return;
+      case 'goto': return play(step.to);
+    }
+  }
+}
+
+function showChoices(items) {
+  const wrap = node('choices', '<div class="choice-hint">Bấm một câu để gửi</div>');
+  items.forEach(it => {
+    const b = document.createElement('button');
+    b.className = 'choice'; b.textContent = it.say;
+    b.onclick = () => { wrap.remove(); add(node('msg user', esc(it.say))); play(it.go); };
+    wrap.appendChild(b);
+  });
+  add(wrap);
+}
+
+function holdCard(c) {
+  return node('card hold-card', `
+    <div class="row"><span class="tag warn">Đang tạm giữ</span><span class="tnum" style="font-size:12px;color:var(--muted)">Hôm nay ${c.time}</span></div>
+    <div class="amt tnum">${fmt(c.amount)}</div>
+    <div class="to">Tới ${esc(c.to)} · ${esc(c.toSub)}</div>
+    <div class="safe">${ICON.shield} Tiền chưa rời ví của bạn</div>`, 1);
+}
+
+function aiMsg(s) {
+  let h = '';
+  if (s.alert) h += `<div class="alert-title">${ICON.stop}<span>${esc(s.alert)}</span></div>`;
+  h += `<div>${esc(s.text)}</div>`;
+  if (s.evidence) {
+    const e = s.evidence;
+    h += `<div class="ev"><div class="ev-head"><span>Mình đánh giá</span><span class="tag ${e.tone}">${esc(e.label)}</span></div>
+      <ul>${e.why.map(w => `<li>${e.quote ? 'Bạn nói “' + esc(w) + '”' : esc(w)}</li>`).join('')}</ul>
+      <div class="foot">${esc(e.foot)}</div></div>`;
+  }
+  return node('msg ai' + (s.alert ? ' alert' : ''), h, s.n);
+}
+
+function trackerHTML(id) {
+  const c = CONFIG.cases[id], st = S.status[id], idx = c.stepOf[st] ?? 0;
+  const finalLabel = { released: id === 'c5' ? 'Đã chuyển tiền' : 'Đã nhả giao dịch', kept: 'Tiếp tục giữ, tiền vẫn trong ví', locked: 'Ví đã khoá' }[st];
+  const steps = c.steps.map((label, i) => {
+    const last = i === c.steps.length - 1;
+    const text = last && finalLabel ? finalLabel : label;
+    const cls = i < idx ? 'done' : i === idx ? 'now' : '';
+    return `<li class="${cls}"><span class="bullet">${i < idx ? ICON.check : ''}</span><span>${esc(text)}</span></li>`;
+  }).join('');
+  const meta = FINAL.includes(st)
+    ? 'Đã xong. Bạn sẽ nhận thông báo trong ứng dụng.'
+    : `Quá ${CONFIG.slaMinutes} phút chưa có kết quả, tư vấn viên sẽ gọi bạn qua số đã đăng ký.`;
+  return `<ol>${steps}</ol><div class="meta">${meta}</div>`;
+}
+function trackerEl(id, n) { const d = node('card tracker', trackerHTML(id), n); d.dataset.case = id; return d; }
+function refreshTrackers() {
+  document.querySelectorAll('.tracker').forEach(t => t.innerHTML = trackerHTML(t.dataset.case));
+}
+
+function verifyEl() {
+  const d = node('card verify', `
+    <div class="face">${ICON.face}</div>
+    <b>Xác thực khuôn mặt</b>
+    <p>Giữ điện thoại ngang mặt trong vài giây.</p>
+    <button class="btn primary block">Xác thực ngay</button>`);
+  const btn = d.querySelector('button');
+  btn.onclick = async () => {
+    const run = S.run;
+    btn.disabled = true; btn.textContent = 'Đang xác thực…'; d.classList.add('scanning');
+    await sleep(1600); if (run !== S.run) return;
+    d.classList.remove('scanning'); d.classList.add('ok');
+    d.querySelector('.face').innerHTML = ICON.check.replace(/10/g, '24');
+    d.querySelector('b').textContent = 'Đã xác thực';
+    d.querySelector('p').textContent = 'Kết quả đã gửi kèm cho tư vấn viên.';
+    btn.remove();
+    setStatus(S.caseId, 'verified');
+    play('verified');
+  };
+  return d;
+}
+
+/* bottom sheet (khoa_vi) */
+function openSheet() { $('#scrim').classList.add('open'); setTimeout(() => $('#lock-yes').focus({ preventScroll: true }), 300); }
+function closeSheet() { $('#scrim').classList.remove('open'); }
+$('#lock-yes').onclick = () => { closeSheet(); add(node('msg user', 'Khoá ví')); play('locked'); };
+$('#lock-no').onclick = () => { closeSheet(); add(node('msg user', 'Để sau')); play('nolock'); };
+$('#scrim').onclick = e => { if (e.target.id === 'scrim') $('#lock-no').click(); };
+
+/* ---------- shared status ---------- */
+function setStatus(id, st) {
+  S.status[id] = st;
+  if (st === 'review' && !S.waitFrom[id]) S.waitFrom[id] = Date.now();
+  if (FINAL.includes(st)) S.decidedAt[id] = Date.now();
+  refreshTrackers();
+  if (S.view === 'agent') renderAgent();
+}
+
+function agentDecide(id, st) {
+  setStatus(id, st);
+  // báo sang phía khách nếu chat đang mở ca này
+  if (S.caseId === id) {
+    const msg = CONFIG.cases[id].notify[st];
+    S.run++; // dừng kịch bản đang chờ, bỏ lựa chọn cũ
+    chat.querySelectorAll('.choices,.typing').forEach(e => e.remove());
+    add(node('sys' + (st === 'released' ? ' done' : ''), esc(msg)));
+  }
+}
+
+/* ---------- agent console ---------- */
+const STATUS_TEXT = { held: 'Chờ khách', verified: 'Khách đã xác thực', review: 'Chờ duyệt', released: 'Đã nhả', kept: 'Tiếp tục giữ', locked: 'Ví đã khoá' };
+const elapsed = from => { const s = Math.floor((Date.now() - from) / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+
+function renderAgent() {
+  const q = $('#queue');
+  q.innerHTML = Object.entries(CONFIG.cases).map(([id, c]) => `
+    <button class="q-item" data-case="${id}" aria-pressed="${id === S.agentCase}">
+      <div class="r1"><b>${esc(c.name)}</b><span class="tag ${c.tone}">${esc(c.tag)}</span></div>
+      <div class="r2"><span class="tnum">${fmt(c.amount)}</span><span>${STATUS_TEXT[S.status[id]]}</span></div>
+    </button>`).join('');
+  q.querySelectorAll('.q-item').forEach(b => b.onclick = () => { S.agentCase = b.dataset.case; renderAgent(); });
+
+  const id = S.agentCase, c = CONFIG.cases[id], st = S.status[id];
+  const isChecked = ch => ch.auto === true || (ch.auto === 'verified' && ['verified', 'review', 'released'].includes(st)) || !!S.checks[id][ch.id];
+  const allOk = c.checks.every(isChecked);
+  const ev = c.evidence.map(e => {
+    let t = esc(e.text);
+    if (e.dyn === 'face') t += ['verified', 'review', 'released'].includes(st) ? ': đạt' : ': chưa làm';
+    return `<li><span>${esc(e.src)}</span><div>${t}</div></li>`;
+  }).join('');
+
+  let decision;
+  if (FINAL.includes(st)) {
+    const when = S.decidedAt[id] ? new Date(S.decidedAt[id]).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '';
+    decision = `<div class="final"><b>${STATUS_TEXT[st]}</b>${st === 'locked' ? 'Khách đã tự khoá ví. Không còn giao dịch nào để nhả.' : 'Đã ghi quyết định lúc ' + when + ' và báo cho khách.'}</div>`;
+  } else {
+    const late = S.waitFrom[id] && (Date.now() - S.waitFrom[id]) > CONFIG.slaMinutes * 60000;
+    decision = `
+      <div class="wait"><span>${S.waitFrom[id] ? 'Khách đã chờ <span class="tnum" id="clock">' + elapsed(S.waitFrom[id]) + '</span>' : 'Khách chưa gửi yêu cầu duyệt'}</span>
+        <span class="${late ? 'late' : ''}">Hạn ${CONFIG.slaMinutes} phút, quá hạn thì gọi khách</span></div>
+      <ul class="checks" data-n="10">${c.checks.map(ch => `
+        <li><label><input type="checkbox" data-check="${ch.id}" ${isChecked(ch) ? 'checked' : ''} ${ch.auto ? 'disabled' : ''}>
+          <span>${esc(ch.text)}${ch.hint ? `<small>${esc(ch.hint)}</small>` : ''}</span></label></li>`).join('')}
+      </ul>
+      <div class="decide">
+        <button class="btn ghost" id="keep">Giữ tiếp</button>
+        <button class="btn primary" id="release" ${allOk ? '' : 'disabled'}>Nhả giao dịch</button>
+      </div>`;
+  }
+
+  $('#detail').innerHTML = `
+    <div class="d-head">
+      <div><h1>${esc(c.name)}</h1><div class="sub">${esc(c.sub)}</div></div>
+      <div class="d-amt"><div class="v tnum">${fmt(c.amount)}</div><div class="s">Tới ${esc(c.to)} · ${c.time}</div></div>
+    </div>
+    <div class="d-grid">
+      <div class="panel ai-read" data-n="8">
+        <div class="panel-title" style="margin:0">AI đọc ca này</div>
+        <div class="label"><strong>${esc(c.tag)}</strong><span class="tag neutral">Gợi ý, không phải kết luận</span></div>
+        <p class="summary">${esc(c.summary)}</p>
+        <ul class="evid">${ev}</ul>
+        ${S.recHidden[id] ? '' : `<div class="rec" data-n="9"><div><b>Đề xuất · </b>${esc(c.rec)}</div><button id="dismiss">Bỏ qua</button></div>`}
+      </div>
+      <div class="panel">
+        <div class="panel-title">Quyết định của bạn</div>
+        ${decision}
+      </div>
+    </div>`;
+
+  $('#detail').querySelectorAll('[data-check]').forEach(i => i.onchange = () => { S.checks[id][i.dataset.check] = i.checked; renderAgent(); });
+  const d = $('#dismiss'); if (d) d.onclick = () => { S.recHidden[id] = true; renderAgent(); };
+  const k = $('#keep'); if (k) k.onclick = () => agentDecide(id, 'kept');
+  const r = $('#release'); if (r) r.onclick = () => openModal(id);
+}
+setInterval(() => {
+  const el = $('#clock');
+  if (el && S.view === 'agent' && S.waitFrom[S.agentCase]) el.textContent = elapsed(S.waitFrom[S.agentCase]);
+}, 1000);
+
+/* release confirm (nha_giao_dich) */
+let modalCase = null;
+function openModal(id) {
+  const c = CONFIG.cases[id]; modalCase = id;
+  $('#modal-title').textContent = `Nhả ${fmt(c.amount)}?`;
+  $('#modal-body').textContent = `Tiền sẽ chuyển tới ${c.to}. Quyết định này ghi tên bạn.`;
+  $('#modal').classList.add('open'); setTimeout(() => $('#modal-no').focus({ preventScroll: true }), 50);
+}
+const closeModal = () => $('#modal').classList.remove('open');
+$('#modal-no').onclick = closeModal;
+$('#modal').onclick = e => { if (e.target.id === 'modal') closeModal(); };
+$('#modal-yes').onclick = () => { closeModal(); agentDecide(modalCase, 'released'); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); if ($('#scrim').classList.contains('open')) $('#lock-no').click(); } });
+
+/* go */
+renderSide();
+startCase('c4');
+</script>
+</body>
+</html>
