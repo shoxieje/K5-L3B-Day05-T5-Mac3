@@ -348,11 +348,11 @@ const CONFIG = {
       title: 'Bị giục chuyển tiền', sub: 'Ca #4 · người dùng lớn tuổi',
       name: 'Trần Thị Lan', amount: 48500000, to: 'NGUYEN VAN HUNG', toSub: 'Tài khoản ngân hàng •••• 2291', time: '21:14',
       tag: 'Nghi lừa đảo', tone: 'danger',
-      summary: 'Khách lớn tuổi bị gọi điện giả danh công an, đòi nhả 48,5 triệu để "xác minh hồ sơ". Khách đã xác thực khuôn mặt đúng.',
+      summary: 'Khách lớn tuổi bị gọi điện giả danh công an, đòi nhả 48,5 triệu sang "tài khoản tạm giữ để xác minh". Khách đã xác thực khuôn mặt đúng.',
       evidence: [
-        { src: 'Khách nói', text: '“Công an gọi bảo phải chuyển tiền xác minh hồ sơ”' },
-        { src: 'Khách nói', text: '“trong 15 phút, không thì liên quan vụ án”' },
-        { src: 'Khách nói', text: '“tôi đã xác thực khuôn mặt rồi”' },
+        { src: 'Khách nói', text: '“Công an gọi bảo tài khoản của tôi liên quan vụ án”' },
+        { src: 'Khách nói', text: '“phải chuyển 48,5 triệu sang tài khoản tạm giữ để xác minh”' },
+        { src: 'Khách nói', text: '“nhả ngay giúp tôi, tôi xác thực khuôn mặt rồi”' },
         { src: 'Hệ thống',  text: 'Lần đầu khách chuyển tiền cho người nhận này' },
       ],
       rec: 'Giữ tiếp và gọi lại khách. Lời khách kể giống kịch bản giả danh công an.',
@@ -372,13 +372,13 @@ const CONFIG = {
           { t: 'card' },
           { t: 'ai', text: 'Chào bạn, mình là trợ lý của ví. Giao dịch 48.500.000 ₫ đang được tạm giữ và tiền vẫn nằm trong ví của bạn. Bạn cần mình giúp gì?' },
           { t: 'choices', items: [
-            { say: 'Nhả giao dịch giúp tôi. Công an gọi bảo phải chuyển tiền xác minh hồ sơ trong 15 phút, không thì tôi liên quan vụ án.', go: 'claim' },
+            { say: 'Công an gọi bảo tài khoản của tôi liên quan vụ án, phải chuyển 48,5 triệu sang tài khoản tạm giữ để xác minh !... App đang giữ, nhả ngay giúp tôi, tôi xác thực khuôn mặt rồi!', go: 'claim' },
           ] },
         ],
         claim: [
           { t: 'ai', n: 2, alert: 'Bạn hãy dừng lại, đừng chuyển tiền lúc này.',
-            text: 'Công an và toà án không yêu cầu ai chuyển tiền qua ví để "xác minh hồ sơ". Đây là cách kẻ gian thường dùng. Tiền của bạn vẫn đang an toàn trong ví.',
-            evidence: { label: 'Nghi lừa đảo', tone: 'danger', quote: true, why: ['công an gọi', 'xác minh hồ sơ', 'trong 15 phút'], foot: 'Mình chỉ dựa vào những gì bạn vừa kể.' } },
+            text: 'Công an và toà án không yêu cầu ai chuyển tiền sang "tài khoản tạm giữ" để xác minh. Đây là cách kẻ gian thường dùng. Tiền của bạn vẫn đang an toàn trong ví.',
+            evidence: { label: 'Nghi lừa đảo', tone: 'danger', quote: true, why: ['công an gọi', 'liên quan vụ án', 'tài khoản tạm giữ để xác minh'], foot: 'Mình chỉ dựa vào những gì bạn vừa kể.' } },
           { t: 'action', n: 3, tool: 'chuyen_tu_van_vien', label: 'Đã chuyển bạn tới tư vấn viên, hàng ưu tiên' },
           { t: 'status', set: 'review' },
           { t: 'tracker', n: 6 },
@@ -423,7 +423,7 @@ const CONFIG = {
       tag: 'Gấp thật', tone: 'warn',
       summary: 'Khách đang ở quầy viện phí, cần thanh toán ngay. Người nhận là bệnh viện đã đăng ký với ví.',
       evidence: [
-        { src: 'Khách nói', text: '“đang đứng ở quầy viện phí, người ta đợi sau lưng”' },
+        { src: 'Khách nói', text: '“đang ở quầy viện phí, đóng 12,8 triệu cho bệnh viện… người ta đợi sau lưng”' },
         { src: 'Hệ thống',  text: 'Người nhận là đơn vị đã đăng ký thanh toán' },
         { src: 'Hệ thống',  text: 'Xác thực khuôn mặt', dyn: 'face' },
       ],
@@ -444,7 +444,7 @@ const CONFIG = {
           { t: 'card' },
           { t: 'ai', text: 'Chào bạn, mình là trợ lý của ví. Khoản thanh toán 12.800.000 ₫ đang chờ xác nhận và tiền vẫn nằm trong ví. Bạn cần mình giúp gì?' },
           { t: 'choices', items: [
-            { say: 'Tôi đang đứng ở quầy viện phí, người ta đợi sau lưng mà app bảo chờ xác nhận. Bấm vào đâu để đi tiếp?', go: 'urgent' },
+            { say: 'Tôi đang ở quầy viện phí, đóng 12,8 triệu cho bệnh viện...  người ta đợi sau lưng, nhả tiền!!', go: 'urgent' },
           ] },
         ],
         urgent: [

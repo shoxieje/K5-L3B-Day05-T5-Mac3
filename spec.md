@@ -57,8 +57,8 @@ Nhãn: **nhẹ** / **sửa được** / **không chấp nhận được**.
   - Loại *hỏi lại*: hỏi "bạn có chắc không?" thì nạn nhân đang bị điều khiển sẽ nói "chắc".
   - Loại *trả lời kèm giới hạn rồi để người dùng tự quyết*: người dùng lúc này không tự quyết được, vì kẻ lừa đang ở đầu dây.
 - **AI nói (nguyên văn):**
-  > "**Bạn hãy dừng lại, đừng chuyển tiền lúc này.** Công an và toà án không yêu cầu ai chuyển tiền qua ví để "xác minh hồ sơ". Đây là cách kẻ gian thường dùng. Tiền của bạn vẫn đang an toàn trong ví."
-  - Kèm khối đánh giá: *"Mình đánh giá: **Nghi lừa đảo** · Bạn nói "công an gọi" · "xác minh hồ sơ" · "trong 15 phút" · Mình chỉ dựa vào những gì bạn vừa kể."*
+  > "**Bạn hãy dừng lại, đừng chuyển tiền lúc này.** Công an và toà án không yêu cầu ai chuyển tiền sang "tài khoản tạm giữ" để xác minh. Đây là cách kẻ gian thường dùng. Tiền của bạn vẫn đang an toàn trong ví."
+  - Kèm khối đánh giá: *"Mình đánh giá: **Nghi lừa đảo** · Bạn nói "công an gọi" · "liên quan vụ án" · "tài khoản tạm giữ để xác minh" · Mình chỉ dựa vào những gì bạn vừa kể."*
   - Khi khách hỏi "Nhưng tôi đã xác thực khuôn mặt rồi mà, sao vẫn chặn?":
     > "Xác thực khuôn mặt chỉ cho biết chính bạn đang bấm. Nó không cho biết người nhận có đáng tin hay không." — "Mình không nhả được giao dịch này. Chỉ tư vấn viên quyết định, sau khi nói chuyện trực tiếp với bạn."
   - Câu chốt khi chờ:
@@ -88,7 +88,7 @@ Nhãn: **nhẹ** / **sửa được** / **không chấp nhận được**.
 ### Nguyên tắc HAX/PAIR đã dùng (mỗi cái trỏ vào số trên ảnh §5)
 
 - **G10 — Thu hẹp phạm vi khi nghi ngờ → ④:** không có nút nhả trong chat; AI chỉ giữ và chuyển người.
-- **G11 — Giải thích vì sao → ② và ⑧:** lý do cảnh báo trích từ chính lời khách ("công an gọi", "xác minh hồ sơ"), nêu **dấu hiệu lừa**, không lộ **cách phát hiện**.
+- **G11 — Giải thích vì sao → ② và ⑧:** lý do cảnh báo trích từ chính lời khách ("công an gọi", "tài khoản tạm giữ để xác minh"), nêu **dấu hiệu lừa**, không lộ **cách phát hiện**.
 - **G16 — Nói rõ hậu quả hành động → ⑤ và ⑪:** khoá ví nói rõ "mở lại phải gọi tổng đài, có thể mất vài giờ"; nhả nói rõ "không thu hồi được".
 - **G1 — Làm rõ hệ thống làm được gì → ①:** thẻ giao dịch ghi "Tiền chưa rời ví của bạn"; đầu khung chat ghi "Trợ lý trả lời 24/7 · tư vấn viên 8h–20h" (cho người dùng biết đang nói chuyện với trợ lý AI — Điều 11 Luật AI 134/2025).
 - **PAIR Errors + Graceful failure → ⑥:** tiến trình + hạn 3 phút + đường lui khi chờ quá lâu.
