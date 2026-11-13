@@ -7,6 +7,19 @@
 
 ## Ảnh có đánh số
 
-Bật công tắc **Đánh số** ở góc phải để hiện số trên màn hình và bảng chú thích, rồi chụp ảnh.
+Bật công tắc **Đánh số** ở góc phải để hiện số trên màn hình và bảng chú thích. Bảng giải thích từng số ①–⑪ nằm ở `spec.md` §5.
 
-<!-- Thêm 1–2 ảnh vào thư mục này, ví dụ: ![Màn hình 1](screen-1.png) -->
+### Màn 1 — Người dùng, ca #4 (bị giục chuyển tiền): số 1, 2, 3, 4, 6, 7
+![Ảnh 1](anh-1-nguoi-dung-ca4.png)
+
+### Màn 1 — Khoá ví cần khách xác nhận: số 5
+![Ảnh 2](anh-2-khoa-vi.png)
+
+### Màn 1 — Người dùng, ca #5 (quầy viện phí): số 1, 6, 7
+![Ảnh 3](anh-3-nguoi-dung-ca5.png)
+
+### Màn 2 — Tư vấn viên duyệt: số 8, 9, 10
+![Ảnh 4](anh-4-tu-van-vien.png)
+
+### Màn 2 — Xác nhận cuối trước khi nhả: số 11
+![Ảnh 5](anh-5-xac-nhan-nha.png)
