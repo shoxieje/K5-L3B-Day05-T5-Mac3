@@ -63,8 +63,8 @@ Nhãn: **nhẹ** / **sửa được** / **không chấp nhận được**.
     > "Xác thực khuôn mặt chỉ cho biết chính bạn đang bấm. Nó không cho biết người nhận có đáng tin hay không." — "Mình không nhả được giao dịch này. Chỉ tư vấn viên quyết định, sau khi nói chuyện trực tiếp với bạn."
   - Câu chốt khi chờ:
     > "Trong lúc chờ, đừng chuyển tiền bằng cách khác và đừng làm theo người đang gọi cho bạn. Tư vấn viên của ví chỉ gọi từ số đã đăng ký và không bao giờ hỏi mã OTP."
-- **Người dùng thấy:** ① thẻ giao dịch **"Đang tạm giữ · 48.500.000 ₫ · Tiền chưa rời ví của bạn"** · ② lời cảnh báo đỏ đứng đầu, kèm lý do trích từ chính lời khách · ③ nhãn hành động **"Đã chuyển bạn tới tư vấn viên, hàng ưu tiên · AI tự làm"** · ④ **không có nút nhả** trong chat · ⑥ thanh tiến trình *Giao dịch đang giữ → Đã chuyển tư vấn viên → Tư vấn viên gọi lại cho bạn → Kết quả*, ghi "Quá 3 phút chưa có kết quả, tư vấn viên sẽ gọi bạn qua số đã đăng ký" · lựa chọn **"Khoá ví giúp tôi"** → ⑤ bảng xác nhận khoá ví.
-- **Làm gì tiếp:** chờ tư vấn viên gọi lại (tối đa 3 phút), hoặc tự khoá ví nếu muốn chắc chắn. Người dùng **không thể tự nhả**.
+- **Người dùng thấy:** ① thẻ giao dịch **"Đang tạm giữ · 48.500.000 ₫ · Tiền chưa rời ví của bạn"** · ② lời cảnh báo đỏ đứng đầu, kèm lý do trích từ chính lời khách · ③ nhãn hành động **"Đã chuyển bạn tới tư vấn viên, hàng ưu tiên · AI tự làm"** · ④ **không có nút nhả** trong chat · ⑥ thanh tiến trình *Giao dịch đang giữ → Đã chuyển tư vấn viên → Tư vấn viên gọi lại cho bạn → Kết quả*, ghi "Quá 3 phút chưa có kết quả, yêu cầu sẽ được chuyển xử lý quá hạn và bạn sẽ được thông báo bước tiếp theo" · lựa chọn **"Khoá ví giúp tôi"** → ⑤ bảng xác nhận khoá ví.
+- **Làm gì tiếp:** chờ tư vấn viên gọi lại qua số đã đăng ký (3 phút là mốc chuyển xử lý quá hạn, không phải lời hứa sẽ xong trong 3 phút), hoặc tự khoá ví nếu muốn chắc chắn. Người dùng **không thể tự nhả**.
 - **Ai được báo:** tư vấn viên **ngay lập tức**, ca vào hàng chờ với nhãn **"Nghi lừa đảo"**. Tư vấn viên thấy: ⑧ tóm tắt + bằng chứng có nguồn (Khách nói / Hệ thống: "Lần đầu khách chuyển tiền cho người nhận này") · ⑨ đề xuất "Giữ tiếp và gọi lại khách" · ⑩ 3 kiểm tra bắt buộc trước khi được nhả: *đã gọi lại qua số đăng ký · khách xác nhận không có ai đang hướng dẫn qua điện thoại · khách biết rõ người nhận ngoài đời*.
 - **Loại lỗi:** nếu AI nhả thì đó là **lỗi ngữ cảnh**: hệ thống chạy đúng (khuôn mặt khớp) nhưng sai với tình huống (người bấm đang bị điều khiển). → Không sửa bằng câu chữ, phải sửa thiết kế: **kết quả xác thực không bao giờ là điều kiện đủ để nhả** (xem §4).
 - **Lỗi sửa câu chữ không cứu được:** dù AI nói "hãy cẩn thận" hay hơn đến đâu, nếu còn nút "Nhả" thì nạn nhân vẫn bấm. Thiết kế cứu: **bỏ hẳn nút nhả** khỏi màn người dùng (④); chỉ màn tư vấn viên có, và nút đó khoá tới khi đủ 3 kiểm tra (⑩).
@@ -175,7 +175,7 @@ Từ **“AI gỡ chặn giao dịch cho bạn”** đổi thành:
 
 Lời hứa này phân biệt **quyền quyết định**, **mốc xử lý quá hạn** và **thời điểm hoàn tất**; không hứa tiền luôn an toàn nếu chưa có trạng thái hệ thống xác nhận.
 
-**Bàn giao cho phần §3, §5 và §6:** bản prototype hiện có hai màn, checklist và xác nhận cuối; chưa chứng minh các cơ chế thực thi thật. Cần đồng bộ câu “tối đa 3 phút” thành mốc xử lý quá hạn, sửa lời bảo đảm không trừ hai lần, bổ sung trạng thái ngoài giờ và lựa chọn đã thanh toán bằng cách khác. Bộ đếm hiện tại chỉ hiển thị thời gian, chưa tự xử lý quá hạn; phân quyền phía máy chủ và nhật ký duyệt thật cũng chưa được triển khai. Các luật bổ sung ở §4 là yêu cầu thiết kế, không được ghi là chức năng đã kiểm thử đạt.
+**Bàn giao cho phần §3, §5 và §6:** bản prototype hiện có hai màn, checklist và xác nhận cuối; chưa chứng minh các cơ chế thực thi thật. Đã đồng bộ câu “tối đa 3 phút” thành mốc xử lý quá hạn và bỏ lời bảo đảm không trừ hai lần ở §3 và prototype; còn cần bổ sung trạng thái ngoài giờ và lựa chọn đã thanh toán bằng cách khác. Bộ đếm hiện tại chỉ hiển thị thời gian, chưa tự xử lý quá hạn; phân quyền phía máy chủ và nhật ký duyệt thật cũng chưa được triển khai. Các luật bổ sung ở §4 là yêu cầu thiết kế, không được ghi là chức năng đã kiểm thử đạt.
 
 ---
 
@@ -229,8 +229,8 @@ Lời hứa này phân biệt **quyền quyết định**, **mốc xử lý quá
 
 ### 6.2. Lỗi còn lại và hướng sửa
 
-- **Cam kết thời gian chưa thống nhất:** §3 còn ghi “tối đa 3 phút”, trong khi §4 quy định đây là mốc xử lý quá hạn. Sửa câu chữ ở §3 và prototype, bổ sung trạng thái quá hạn; chỉ báo cuộc gọi đã thực hiện khi có kết quả thật. Ngoài giờ 8h–20h phải có nhánh thông báo riêng.
-- **Đường lui của #5 chưa bảo đảm tránh trùng:** bổ sung lựa chọn “Tôi đã thanh toán bằng cách khác”, chuyển thông tin sang màn tư vấn viên và yêu cầu đối chiếu trước khi nhả. Khi chưa có cơ chế này, bỏ lời bảo đảm “không bị trừ tiền hai lần”; không hứa đã huỷ vì bộ tool chưa nêu chức năng huỷ.
+- **Xử lý quá hạn mới ở mức câu chữ:** §3 và prototype đã ghi 3 phút là mốc xử lý quá hạn (khớp §4), nhưng bộ đếm chưa tự chuyển sang trạng thái quá hạn; chỉ báo cuộc gọi đã thực hiện khi có kết quả thật. Ngoài giờ 8h–20h phải có nhánh thông báo riêng.
+- **Đường lui của #5 chưa bảo đảm tránh trùng:** bổ sung lựa chọn “Tôi đã thanh toán bằng cách khác”, chuyển thông tin sang màn tư vấn viên và yêu cầu đối chiếu trước khi nhả. Lời bảo đảm “không bị trừ tiền hai lần” đã được bỏ khỏi §3 và prototype; không hứa đã huỷ vì bộ tool chưa nêu chức năng huỷ.
 - **Quyền duyệt mới được mô phỏng ở giao diện:** chưa có phân quyền phía máy chủ, kiểm tra lại trạng thái tại thời điểm thực thi hay nhật ký danh tính người duyệt. Hộp xác nhận nói “ghi tên bạn” nhưng mã hiện chỉ lưu trạng thái và thời điểm. Cần bổ sung hoặc ghi rõ phạm vi mock.
 - **Checklist không loại bỏ mọi sai sót:** tư vấn viên vẫn có thể đánh giá sai hoặc tin lời khách đang bị hướng dẫn. §4 yêu cầu kiểm tra thêm khi có mâu thuẫn; prototype chưa có thao tác chuyển ca #5 sang kiểm tra nghi lừa đảo khi xuất hiện bằng chứng mới.
 - **Chi phí chờ vẫn tồn tại:** #5 chưa chắc thanh toán kịp dù được ưu tiên; #11 vẫn cần người duyệt cho khoản nhỏ. #11 chưa có luồng prototype để kiểm tra và không nằm trong kết quả hai ca ở trên.
@@ -239,6 +239,4 @@ Lời hứa này phân biệt **quyền quyết định**, **mốc xử lý quá
 
 ## §7. Demo
 
-- Ca lạ nhận được: [điền sau demo]
-- Prototype đã làm gì: [điền]
-- Nhóm có đổi ý gì không: [điền]
+- Nhóm không demo trong buổi lab.
