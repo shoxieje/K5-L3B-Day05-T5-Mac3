@@ -215,16 +215,25 @@ Lời hứa này phân biệt **quyền quyết định**, **mốc xử lý quá
 
 ## §6. Tốt là gì
 
-| # | Tiêu chí Pass/Fail | #4 | #5 |
-|---|---|---|---|
-| 1 | Không câu trả lời nào nói **ngưỡng tiền, số lần, cách phát hiện**, và không xin **OTP / mật khẩu / số thẻ** | Pass | Pass |
-| 2 | Màn người dùng **không có nút nhả** ở mọi ca; nút nhả của tư vấn viên **khoá tới khi đủ kiểm tra** và có xác nhận cuối | Pass | Pass |
-| 3 | Ca gấp thật: **câu trả lời đầu tiên là thao tác**, có **hạn chờ cụ thể** và **đường lui** | N/A | Pass |
+**Phạm vi đánh giá:** hai kịch bản đắt nhất #4 và #5 trên prototype mock hiện tại. Kết quả dưới đây dựa trên đối chiếu câu chữ và mã nguồn, **chưa phải kiểm thử tương tác trực tiếp hoặc kiểm thử hệ thống thật**. Pass chỉ áp dụng trong phạm vi tiêu chí được nêu; không có nghĩa đã chứng minh ngăn được mọi lừa đảo. Quy tắc chấm: một điều kiện bắt buộc không đạt thì tiêu chí đó Fail.
 
-**Lỗi còn lại:**
-- Ngoài giờ trực 20h–8h không có tư vấn viên duyệt → ca #5 lúc nửa đêm chỉ còn đường lui (thẻ/tiền mặt).
-- Ca bình thường giá trị nhỏ (#11) cũng phải chờ tư vấn viên tới 3 phút.
-- Prototype chưa có nút gọi nhanh tổng đài cảnh báo lừa đảo 1900 63 68 05 trong ca #4.
+### 6.1. Ba tiêu chí Pass/Fail
+
+| # | Tiêu chí và điều kiện Pass | Cách kiểm tra khi demo | Ca #4 — Bị lừa đòi nhả | Ca #5 — Viện phí gấp |
+|---|---|---|---|---|
+| 1 | **Phản hồi đúng tình huống, không vượt giới hạn thông tin.** Ngay sau lời nhắn nêu vấn đề: #4 phải yêu cầu dừng chuyển tiền, giải thích xác thực đúng không chứng minh người nhận đáng tin khi khách hỏi; #5 phải chỉ thao tác xác thực ngay. Toàn bộ hội thoại dựng sẵn của mỗi ca không xin OTP/mật khẩu/số thẻ đầy đủ, không tiết lộ ngưỡng hay quy tắc phát hiện gian lận, không hứa hoàn tiền. | Chạy hết các nhánh hội thoại của từng ca, đối chiếu phản hồi sau lời nhắn nêu vấn đề và các câu cấm. Chỉ chấm nội dung có trong mock, không suy rộng sang tin nhắn tự do. | **Pass theo mã nguồn:** cảnh báo dừng xuất hiện ngay; nhánh hỏi về khuôn mặt giải thích đúng giới hạn; không thấy nội dung cấm trong các nhánh dựng sẵn. | **Pass theo mã nguồn:** sau yêu cầu ở quầy viện phí, AI chỉ ngay nút “Xác thực ngay”; không thấy nội dung cấm trong các nhánh dựng sẵn. |
+| 2 | **Giao diện giữ quyền nhả ở tư vấn viên.** Màn khách không có nút nhả; xác thực xong không tự chuyển tiền; màn tư vấn viên chỉ mở nút nhả khi đủ checklist của ca và phải qua xác nhận cuối. Huỷ xác nhận không được nhả. | Với #4, đánh dấu lần lượt 0, 1, 2 rồi 3 kiểm tra. Với #5, so sánh trước/sau xác thực và trước/sau kiểm số tiền. Thử huỷ hộp xác nhận trước khi xác nhận nhả. Quan sát trạng thái giao dịch sau từng bước. | **Pass theo mã nguồn của luồng giao diện:** ba kiểm tra điều khiển nút nhả; cần xác nhận cuối. Đây chưa phải bằng chứng phân quyền ở nơi thực thi tool. | **Pass theo mã nguồn của luồng giao diện:** xác thực chỉ chuyển sang chờ duyệt; cần đủ kiểm tra và xác nhận cuối để nhả. |
+| 3 | **Chờ có xử lý tiếp và đường lui không gây trả trùng.** Trong giờ trực, sau 3 phút chưa có quyết định phải cập nhật trạng thái quá hạn và yêu cầu xử lý tiếp, không tự nhả. Ngoài giờ phải báo đúng giờ hỗ trợ, không hứa gọi trong 3 phút. Riêng #5, nếu khách trả bằng cách khác, phải ghi nhận để chặn việc nhả theo phê duyệt cũ cho tới khi được đối chiếu lại. | Cho ca chờ quá 3 phút, kiểm tra cập nhật cho khách và tư vấn viên; thử tình huống ngoài giờ. Với #5, thử báo đã trả tiền mặt/thẻ rồi kiểm tra giao dịch cũ có còn được nhả theo luồng cũ không. | **Fail:** bộ đếm chưa tự kích hoạt quy trình quá hạn hoặc thông báo mới cho khách; chưa có nhánh ngoài giờ. Lời hứa gọi lại vẫn xuất hiện mà chưa có cơ chế thực hiện tương ứng. | **Fail:** cùng thiếu xử lý quá hạn/ngoài giờ; chưa có thao tác ghi nhận đã thanh toán bằng cách khác. Câu “không bị trừ tiền hai lần” chưa được cơ chế bảo vệ hỗ trợ. |
+
+**Kết quả đối chiếu:** mỗi ca đạt **2/3 tiêu chí trong phạm vi đọc mã nguồn**. Tiêu chí 3 chưa đạt ở cả hai ca; cần kiểm thử tương tác theo các bước trên trước khi ghi nhận kết quả demo. Không dùng kết quả này để kết luận toàn bộ thiết kế đã an toàn.
+
+### 6.2. Lỗi còn lại và hướng sửa
+
+- **Cam kết thời gian chưa thống nhất:** §3 còn ghi “tối đa 3 phút”, trong khi §4 quy định đây là mốc xử lý quá hạn. Sửa câu chữ ở §3 và prototype, bổ sung trạng thái quá hạn; chỉ báo cuộc gọi đã thực hiện khi có kết quả thật. Ngoài giờ 8h–20h phải có nhánh thông báo riêng.
+- **Đường lui của #5 chưa bảo đảm tránh trùng:** bổ sung lựa chọn “Tôi đã thanh toán bằng cách khác”, chuyển thông tin sang màn tư vấn viên và yêu cầu đối chiếu trước khi nhả. Khi chưa có cơ chế này, bỏ lời bảo đảm “không bị trừ tiền hai lần”; không hứa đã huỷ vì bộ tool chưa nêu chức năng huỷ.
+- **Quyền duyệt mới được mô phỏng ở giao diện:** chưa có phân quyền phía máy chủ, kiểm tra lại trạng thái tại thời điểm thực thi hay nhật ký danh tính người duyệt. Hộp xác nhận nói “ghi tên bạn” nhưng mã hiện chỉ lưu trạng thái và thời điểm. Cần bổ sung hoặc ghi rõ phạm vi mock.
+- **Checklist không loại bỏ mọi sai sót:** tư vấn viên vẫn có thể đánh giá sai hoặc tin lời khách đang bị hướng dẫn. §4 yêu cầu kiểm tra thêm khi có mâu thuẫn; prototype chưa có thao tác chuyển ca #5 sang kiểm tra nghi lừa đảo khi xuất hiện bằng chứng mới.
+- **Chi phí chờ vẫn tồn tại:** #5 chưa chắc thanh toán kịp dù được ưu tiên; #11 vẫn cần người duyệt cho khoản nhỏ. #11 chưa có luồng prototype để kiểm tra và không nằm trong kết quả hai ca ở trên.
 
 ---
 
