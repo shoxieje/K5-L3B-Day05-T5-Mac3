@@ -634,7 +634,7 @@ function trackerHTML(id) {
   }).join('');
   const meta = FINAL.includes(st)
     ? 'Đã xong. Bạn sẽ nhận thông báo trong ứng dụng.'
-    : `Quá ${CONFIG.slaMinutes} phút chưa có kết quả, tư vấn viên sẽ gọi bạn qua số đã đăng ký.`;
+    : `Quá ${CONFIG.slaMinutes} phút chưa có kết quả, yêu cầu sẽ được chuyển xử lý quá hạn và bạn sẽ được thông báo bước tiếp theo.`;
   return `<ol>${steps}</ol><div class="meta">${meta}</div>`;
 }
 function trackerEl(id, n) { const d = node('card tracker', trackerHTML(id), n); d.dataset.case = id; return d; }
