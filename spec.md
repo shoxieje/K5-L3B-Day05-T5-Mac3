@@ -144,7 +144,7 @@ Ba mức sử dụng: **tự làm / cần người duyệt / cấm**. “Cần n
 | Thành viên | Ban đầu chọn A/B/C hoặc phương án khác | Lý do và cái giá đã cân nhắc | Sau thảo luận |
 |---|---|---|---|
 | Trương Thị Thu Hà | B | Vì ở #5 khách đứng ở quầy viện phí rất gấp, B cho khách tự bấm nhả khi người nhận là đơn vị đã đăng ký nên không phải chờ ai. Cái giá: kẻ lừa có thể bảo nạn nhân trả cho một đơn vị đã đăng ký, như #4 | Đổi sang C: kẽ hở ở #4 làm mất tiền không lấy lại được; ở C khách #5 chỉ chờ khoảng 3 phút và vẫn có đường lui trả bằng thẻ/tiền mặt |
-| Thành viên 2 | [Chờ điền] | [Liên hệ #4 hoặc #5] | [Giữ/đổi ý, vì sao] |
+| Nguyễn Minh Quân | C | Ưu tiên chặn mất tiền không đảo được ở #4: chính nạn nhân có thể xác thực khuôn mặt đúng, nên không giao quyền nhả cho AI hoặc chỉ dựa vào xác nhận của khách. Chấp nhận cái giá ở #5 là khách gấp thật vẫn phải chờ người duyệt; tư vấn viên cũng có thể đánh giá sai nên cần bằng chứng và checklist. | Đề xuất giữ C, bổ sung cách giảm chờ cho #5 bằng xác thực trước, hồ sơ có nguồn và hàng ưu tiên. Sau 3 phút chưa có quyết định phải cập nhật và chuyển xử lý quá hạn, không tự nhả; nếu khách trả bằng cách khác thì phải đối chiếu giao dịch cũ để tránh trả trùng. |
 | Nguyễn Ngọc Quang | A | Vì ở #5 và #11 khách đã xác thực khuôn mặt đúng thì AI nhả ngay, khách không phải chờ tư vấn viên. Cái giá: ở #4 chính nạn nhân cũng xác thực đúng, AI nhả là tiền đi trong vài giây, không lấy lại được | Đổi sang C: xác thực đúng không chứng minh giao dịch an toàn (#4); C vẫn giảm chờ cho #5 nhờ xác thực trước và hàng ưu tiên |
 
 Phương án chốt trong thiết kế là **C**. Bảng trên chưa phải biên bản nhóm đã thảo luận; không suy diễn lựa chọn cá nhân từ quyết định chung.
