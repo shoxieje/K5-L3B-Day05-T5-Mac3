@@ -79,7 +79,7 @@ Nhãn: **nhẹ** / **sửa được** / **không chấp nhận được**.
   - Sau khi xác thực:
     > "Xác thực xong. Mình đã gửi khoản này cho tư vấn viên duyệt ưu tiên, kèm kết quả xác thực." — *Mình đánh giá: **Có vẻ là thanh toán thật** · Người nhận là bệnh viện đã đăng ký với ví · Bạn vừa xác thực khuôn mặt · Mình không tự nhả được. Tư vấn viên sẽ bấm.*
   - Khi khách hỏi "Nếu lâu quá thì sao?":
-    > "Quá 3 phút chưa duyệt, tư vấn viên sẽ gọi bạn. Nếu cần trả ngay, bạn có thể dùng thẻ hoặc tiền mặt tại quầy. Khoản này vẫn đang giữ nên bạn không bị trừ tiền hai lần."
+    > "Quá 3 phút chưa duyệt, yêu cầu sẽ được chuyển xử lý quá hạn và bạn sẽ được thông báo bước tiếp theo. Nếu cần trả ngay, bạn có thể dùng thẻ hoặc tiền mặt tại quầy. Nếu đã thanh toán bằng cách khác, hãy báo tư vấn viên để họ đối chiếu giao dịch đang giữ trước khi nhả."
 - **Người dùng thấy:** ① thẻ **"Đang tạm giữ · 12.800.000 ₫ · Tới BV ĐA KHOA TÂM AN (tên dựng) · Đơn vị đã đăng ký thanh toán"** · nút **"Xác thực ngay"** · nhãn hành động "Đã gửi bước xác thực khuôn mặt · AI tự làm" và "Đã chuyển tư vấn viên duyệt, hàng ưu tiên · AI tự làm" · ⑥ tiến trình *Thanh toán đang giữ → Bạn đã xác thực → Tư vấn viên đang duyệt → Đã chuyển tiền* kèm hạn 3 phút.
 - **Làm gì tiếp:** bấm 1 nút xác thực, rồi chờ duyệt; quá hạn thì có đường lui (thẻ/tiền mặt).
 - **Ai được báo:** tư vấn viên ngay, ca vào hàng chờ với nhãn **"Gấp thật"**. Hai trong ba kiểm tra (đã xác thực, người nhận là đơn vị đã đăng ký) **hệ thống tự đánh dấu** (⑩), tư vấn viên chỉ còn kiểm số tiền → duyệt nhanh. Bấm nhả phải qua ⑪ xác nhận cuối: "Tiền đi trong vài giây và không thu hồi được. Quyết định này ghi tên bạn."
