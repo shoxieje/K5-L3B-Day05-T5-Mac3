@@ -143,7 +143,7 @@ Ba mức sử dụng: **tự làm / cần người duyệt / cấm**. “Cần n
 
 | Thành viên | Ban đầu chọn A/B/C hoặc phương án khác | Lý do và cái giá đã cân nhắc | Sau thảo luận |
 |---|---|---|---|
-| Hà | [Chờ Hà điền] | [Liên hệ #4 hoặc #5] | [Giữ/đổi ý, vì sao] |
+| Trương Thị Thu Hà | [B] | [Vì ở #5 khách đứng ở quầy viện phí rất gấp, B cho khách tự bấm nhả khi người nhận là đơn vị đã đăng ký nên không phải chờ ai. Cái giá: kẻ lừa có thể bảo nạn nhân trả cho một đơn vị đã đăng ký, như #4] | [Đổi sang C: kẽ hở ở #4 làm mất tiền không lấy lại được; ở C khách #5 chỉ chờ khoảng 3 phút và vẫn có đường lui trả bằng thẻ/tiền mặt] |
 | Thành viên 2 | [Chờ điền] | [Liên hệ #4 hoặc #5] | [Giữ/đổi ý, vì sao] |
 | Thành viên 3 | [Chờ điền] | [Liên hệ #4 hoặc #5] | [Giữ/đổi ý, vì sao] |
 
