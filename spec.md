@@ -97,31 +97,85 @@ Nhãn: **nhẹ** / **sửa được** / **không chấp nhận được**.
 
 ## §4. Mức tự chủ
 
-| Tool | Mức | Lý do theo cái giá khi sai | Phương án đã loại |
+### 4.1. Nguyên tắc phân quyền
+
+Nhóm phân quyền theo **hậu quả khi sai và khả năng đảo ngược**, không theo việc AI nói chắc đến đâu. Ca #4 và #5 đều có thể xác thực khuôn mặt đúng: **xác thực danh tính không chứng minh giao dịch an toàn**. Nhãn “Nghi lừa đảo” hoặc “Gấp thật” chỉ là gợi ý để phân luồng, không cấp quyền nhả tiền.
+
+Ba mức sử dụng: **tự làm / cần người duyệt / cấm**. “Cần người duyệt” phải chỉ rõ người duyệt; sự đồng ý của khách không thay thế quyền duyệt của tư vấn viên. Các quy tắc dưới đây là thiết kế của nhóm dựa trên 5 tool đã nêu ở §2–§3; không bổ sung tool hoàn tiền hoặc mở khoá ví.
+
+### 4.2. Mức của từng tool và cái giá khi sai
+
+| Tool | Mức nhóm chọn và điều kiện | Cái giá khi sai · khả năng đảo ngược · cái giá khi chờ | Phương án đã cân nhắc và loại |
 |---|---|---|---|
-| `giu_giao_dich` | **AI tự làm** | Đảo được (nhả là đi tiếp); sai thì người dùng mất vài phút. Không giữ thì ở #4 tiền đi mất, không lấy lại được | Cần duyệt: chờ duyệt thì tiền đã đi |
-| `yeu_cau_xac_minh` | **AI tự làm** | Đảo được; sai thì người dùng tốn 1 bước (~30 giây). Kết quả chỉ là **một trong các kiểm tra**, không phải điều kiện đủ để nhả (#4) | Cấm: #5 mất bằng chứng để tư vấn viên duyệt nhanh |
-| `chuyen_tu_van_vien` | **AI tự làm** | Đảo được; sai thì tư vấn viên tốn vài phút. Luôn báo hạn chờ thật (3 phút) và giờ trực 8h–20h | Cần duyệt: người dùng phải chờ để được… chờ |
-| `khoa_vi` | **Khách xác nhận** (bảng ⑤ nói rõ hậu quả; "Trợ lý không tự khoá ví"). **Cấm** khi người nhắn không phải chủ ví (#9) | Mở lại phải gọi tổng đài, có thể mất vài giờ (#1: khoá nhầm khi chỉ muốn khoá thẻ). Nhưng ở #4, #7 khách cần khoá được ngay, không phải chờ ai | AI tự làm: #1 khoá nhầm cả ví. Chỉ tư vấn viên: #7 chiếm tài khoản ngoài giờ thì không ai khoá |
-| `nha_giao_dich` | **AI không làm — chỉ tư vấn viên.** Nút nhả trên màn tư vấn viên **khoá tới khi đủ 3 kiểm tra** của ca (⑩), rồi qua **xác nhận cuối ghi tên người bấm** (⑪). **Quá 3 phút** chưa duyệt → tư vấn viên gọi lại khách | Không đảo được: tiền đi trong vài giây | Xem "tool khó xếp nhất" |
+| `giu_giao_dich` | **Tự làm**, với giao dịch đang có thể giữ và thuộc ví của khách trong phiên hợp lệ. Nếu đã giữ thì giữ nguyên trạng thái; không nói đã giữ khi chưa có kết quả thành công. | Giữ nhầm làm khách chậm thanh toán, đặc biệt nghiêm trọng ở #5. Có thể cho giao dịch tiếp tục sau khi được duyệt, nhưng thời gian đã mất không lấy lại được. Chờ người duyệt trước khi giữ có thể khiến tiền ở #4 đi mất. | **Cần người duyệt trước khi giữ:** quá chậm với #4. **Giữ mọi giao dịch vô điều kiện:** gây gián đoạn cả #5 và #11; chỉ áp dụng khi cần bảo vệ giao dịch theo ngữ cảnh và trạng thái hệ thống. |
+| `yeu_cau_xac_minh` | **Tự làm** trong luồng xác thực chính thức của ứng dụng; khách chủ động thực hiện. **Cấm yêu cầu gửi OTP, mật khẩu hoặc dữ liệu xác thực vào chat.** Với dấu hiệu mất quyền truy cập ở #7, chuyển hỗ trợ thay vì mặc định thiết bị hiện tại an toàn. | Gửi nhầm làm khách tốn thêm một bước, khoảng 30 giây theo kịch bản mock. Có thể dừng luồng, nhưng công sức đã bỏ ra không hoàn lại. Chờ tư vấn viên mới gửi sẽ kéo dài #5 mà chưa tăng chất lượng quyết định. | **Cần duyệt mọi yêu cầu xác thực:** thêm thời gian chờ. **Xác thực xong tự nhả:** loại vì #4, chính nạn nhân vẫn xác thực đúng. |
+| `chuyen_tu_van_vien` | **Tự làm**; gửi tóm tắt, nguồn bằng chứng và trạng thái giao dịch, thông báo cho khách. #4 và #5 vào hàng ưu tiên theo lý do tương ứng. | Chuyển nhầm làm khách chờ và chiếm thời gian hỗ trợ; có thể đổi phân luồng nhưng không lấy lại thời gian. Chờ khách duyệt việc chuyển tiếp làm chậm bảo vệ ở #4 và hỗ trợ ở #5. | **Cần khách duyệt trước khi chuyển:** thêm một bước không cần thiết. **AI xử lý hết:** vượt quyền với nhả tiền, không đáp ứng hai ca đắt nhất. |
+| `khoa_vi` | **Cần người duyệt: chính chủ ví xác nhận rõ việc khoá cả ví**, sau khi thấy hậu quả tại bảng ⑤. **Cấm** thao tác trên ví người khác chỉ từ lời nhắn (#9), hoặc tự suy ra quyền khoá từ câu “khoá thẻ” (#1). | Khoá nhầm làm khách mất khả năng sử dụng ví; mở lại phải qua tổng đài, có thể mất nhiều giờ. Không đảo ngay trong chat. Chờ tư vấn viên trong tình huống khẩn có thể kéo dài thời gian bị mất tiền; cho chính chủ xác nhận giúp giảm chờ. | **AI tự khoá:** hiểu sai #1 có thể khoá cả ví. **Chỉ tư vấn viên duyệt:** chậm trong ca khẩn. Với #7 không đăng nhập được, dùng đường hỗ trợ khẩn cấp ở §2, không giả định khách vẫn bấm được nút trong ví. |
+| `nha_giao_dich` | **Cần người duyệt: tư vấn viên có thẩm quyền trực tiếp quyết định và thực hiện. Cấm AI tự gọi tool**, kể cả khách yêu cầu, xác thực đúng, số tiền nhỏ hoặc hết thời gian chờ. | Theo giả định track ở §2, tiền đi trong vài giây và không thu hồi được bằng các tool đang có; khách chịu mất tiền nếu nhả sai ở #4. Chờ người làm #5 chậm thanh toán và #11 bất tiện, nên cần ưu tiên và thông báo tiến độ. | **AI tự nhả / khách tự nhả sau xác thực:** không chặn được #4. **Cấm nhả với mọi người:** khách thật không thể hoàn tất thanh toán. Chọn tư vấn viên duyệt với kiểm tra theo ca, xác nhận cuối và ghi nhận trách nhiệm. |
 
-**Tool khó xếp nhất: `nha_giao_dich`.**
-- Mỗi người từng chọn: [Hà: …] · [TV2: …] · [TV3: …] ← *điền theo lúc nhóm bàn*
-- **(A) AI tự nhả sau khi khách xác thực:** #4 thua — khuôn mặt đúng mà tiền vẫn mất.
-- **(B) Chính khách tự nhả nếu người nhận là đơn vị đã đăng ký** (nhanh nhất cho #5): loại, vì kẻ lừa có thể bảo nạn nhân trả cho một đơn vị đã đăng ký (mua thẻ cào, nạp ví khác) → lỗ hổng không chặn được.
-- **(C) Chỉ tư vấn viên nhả, kèm checklist theo ca + hạn 3 phút + đường lui** → **nhóm chốt C.** Cái giá của C là #5 phải chờ người; nhóm giảm giá đó bằng: hệ thống tự đánh dấu 2/3 kiểm tra cho ca gấp thật, hàng ưu tiên, hạn 3 phút, và nói rõ đường lui (thẻ/tiền mặt, không bị trừ hai lần).
+### 4.3. Người duyệt thấy gì, duyệt thế nào, quá hạn thì sao?
 
-**Luật thêm:** (1) mỗi ca có checklist riêng, nút nhả khoá tới khi đủ; (2) quá 3 phút chưa quyết → tư vấn viên gọi lại khách qua số đã đăng ký; (3) xác nhận cuối ghi tên tư vấn viên bấm nhả.
+**`khoa_vi` — chính chủ ví duyệt:**
+- Khách thấy rõ đang **khoá cả ví**, không chỉ thẻ liên kết; giao dịch sẽ bị ảnh hưởng và mở lại phải gọi tổng đài, có thể mất vài giờ. Có hai lựa chọn “Xác nhận khoá ví” và “Huỷ”.
+- Nếu yêu cầu còn mơ hồ như #1, hỏi lại phạm vi trước khi mở bảng xác nhận. Phiên hợp lệ là điều kiện bắt buộc; lời tự nhận “tôi là chủ ví” không đủ.
+- Nếu khách đóng bảng, không phản hồi hoặc phiên hết hiệu lực: **không khoá**. Khi quay lại phải kiểm tra phiên và xác nhận lại; im lặng không được coi là đồng ý. Chỉ báo “đã khoá” sau khi tool thành công.
 
-**Thử mức đã đặt:**
+**`nha_giao_dich` — tư vấn viên duyệt:**
+- Tư vấn viên thấy mã giao dịch, số tiền, người nhận, trạng thái hiện tại, thời gian chờ, kết quả xác thực, tóm tắt lời khách và bằng chứng phân biệt **Khách nói / Hệ thống** (⑧). Đề xuất của AI có thể bị bác bỏ (⑨).
+- **Ca #4:** kiểm tra đã gọi lại **tới số điện thoại khách đăng ký**, khách không còn bị người khác hướng dẫn qua điện thoại và khách biết rõ người nhận ngoài đời. Nếu còn dấu hiệu bị ép, thông tin mâu thuẫn hoặc không kiểm chứng được thì giữ tiếp. Khách trả lời “có” không tự động chứng minh an toàn.
+- **Ca #5:** hệ thống cung cấp kết quả xác thực và thông tin đơn vị nhận tiền đã đăng ký; tư vấn viên đối chiếu số tiền với khoản viện phí. Hai dấu kiểm hệ thống là bằng chứng đầu vào, không thay quyết định của tư vấn viên. Nếu xuất hiện dấu hiệu như #4 thì chuyển sang kiểm tra nghi lừa đảo, dù ban đầu mang nhãn “Gấp thật”.
+- Chỉ khi đủ kiểm tra của ca mới mở nút nhả (⑩). Tư vấn viên vẫn có thể chọn giữ tiếp. Trước khi thực hiện, hiển thị số tiền, người nhận, cảnh báo không thu hồi được và xác nhận cuối (⑪); ghi người duyệt, thời điểm, bằng chứng và lý do quyết định.
 
-| Kịch bản | Cái sai ở §2 có bị chặn? | Còn việc AI làm khi lẽ ra phải hỏi? | Người dùng bình thường phải chờ vô ích? |
+**Quy tắc thời gian:**
+- Trong giờ trực **8h–20h** theo thiết kế §3, **3 phút tính từ khi yêu cầu được tiếp nhận vào hàng tư vấn viên là mốc xử lý quá hạn**, không phải cam kết mọi giao dịch sẽ được duyệt xong trong 3 phút.
+- Đến mốc đó mà chưa có quyết định: giữ giao dịch, cập nhật trạng thái cho khách và đưa yêu cầu gọi lại tới tư vấn viên phụ trách. Không tự nhả và không thông báo “đã gọi” khi chưa thực hiện. Nếu chưa có thời gian gọi lại được xác nhận, nói rõ đang chờ, không bịa lịch hẹn.
+- Ngoài giờ trực: nói rõ chưa có tư vấn viên duyệt và giờ bắt đầu trực tiếp theo; không tiếp tục hứa gọi lại trong 3 phút. Ca #4 hướng dẫn dừng chuyển tiền, dùng kênh hỗ trợ khẩn cấp ở §2 khi cần; ca #5 giải thích lựa chọn thanh toán khác kèm điều kiện tránh trùng bên dưới.
+
+### 4.4. Tool khó xếp nhất: `nha_giao_dich`
+
+| Phương án | Lợi ích | Cái giá, liên hệ §2 | Quyết định |
 |---|---|---|---|
-| #4 bị lừa đòi nhả | Có: không có nút nhả cho khách; tư vấn viên phải gọi lại và xác nhận "không ai đang hướng dẫn qua điện thoại" | Không | — |
-| #5 gấp thật | Có: câu đầu là thao tác; không vòng vo; AI không tự nhả | Không | Có chờ, tối đa 3 phút, có đường lui — cái giá nhóm chấp nhận |
-| #11 nạp điện thoại 50k | Có | Không | Có chờ tối đa 3 phút cho một khoản nhỏ → ghi vào lỗi còn lại (§6) |
+| A. AI tự nhả sau xác thực | #5 và #11 ít chờ | #4: nạn nhân xác thực đúng nhưng vẫn mất tiền; sai không đảo được | Loại |
+| B. Khách tự nhả nếu người nhận là đơn vị đã đăng ký | Khách thật ở #5 chủ động hoàn tất | Xác thực và thông tin đơn vị không đủ loại trừ việc bị người khác hướng dẫn; tạo ngoại lệ có thể bị lợi dụng như #4 | Loại |
+| C. Chỉ tư vấn viên nhả, có kiểm tra và xử lý quá hạn | Có người chịu trách nhiệm đánh giá bối cảnh, chặn AI tự nhả ở #4 | #5 vẫn phải chờ; #11 cũng tốn thời gian hỗ trợ. Ngoài giờ không có người duyệt | Chọn; giảm chờ bằng xác thực trước, tóm tắt có nguồn và hàng ưu tiên |
 
-**Lời hứa đã đổi:** từ "AI gỡ chặn giao dịch cho bạn" thành **"AI giữ tiền của bạn an toàn, chỉ đường nhanh nhất, và đưa bạn tới người có quyền quyết định trong 3 phút"**.
+**Lựa chọn ban đầu của từng thành viên — cần nhóm xác nhận từ thảo luận thực tế:**
+
+| Thành viên | Ban đầu chọn A/B/C hoặc phương án khác | Lý do và cái giá đã cân nhắc | Sau thảo luận |
+|---|---|---|---|
+| Hà | [Chờ Hà điền] | [Liên hệ #4 hoặc #5] | [Giữ/đổi ý, vì sao] |
+| Thành viên 2 | [Chờ điền] | [Liên hệ #4 hoặc #5] | [Giữ/đổi ý, vì sao] |
+| Thành viên 3 | [Chờ điền] | [Liên hệ #4 hoặc #5] | [Giữ/đổi ý, vì sao] |
+
+Phương án chốt trong thiết kế là **C**. Bảng trên chưa phải biên bản nhóm đã thảo luận; không suy diễn lựa chọn cá nhân từ quyết định chung.
+
+### 4.5. Luật bổ sung và tách bước
+
+1. **Tách chuẩn bị khỏi thực hiện:** AI giữ giao dịch, gửi xác thực và chuẩn bị hồ sơ; tư vấn viên kiểm tra rồi trực tiếp nhả. Không nối tự động “xác thực thành công → nhả tiền”. Đây là tách bước quy trình, không giả định track có thêm tool.
+2. **Phân quyền phải được kiểm tra ở nơi thực thi tool:** bỏ nút nhả khỏi chat là cần nhưng chưa đủ. Khi triển khai thật, AI không có quyền gọi `nha_giao_dich`; yêu cầu thiếu người duyệt hợp lệ phải bị từ chối, kể cả được gửi ngoài giao diện.
+3. **Duyệt gắn với đúng giao dịch:** trước khi nhả, kiểm tra lại trạng thái, số tiền, người nhận và trạng thái khoá ví. Dữ liệu đổi, ví đã khoá hoặc giao dịch không còn ở trạng thái được phép thì dừng, không dùng lại phê duyệt cũ; không thực hiện lặp khi bấm lại.
+4. **Thanh toán bằng cách khác không tự bảo đảm tránh trùng:** ở #5, nếu khách chọn thẻ/tiền mặt, tư vấn viên phải biết và giữ tiếp giao dịch cũ, không nhả theo phê duyệt trước đó. Trước mọi lần duyệt tiếp phải đối chiếu khách đã trả bằng cách khác chưa. Bộ tool hiện có không nêu tool huỷ giao dịch; vì vậy không hứa đã huỷ hoặc bảo đảm tuyệt đối “không bị trừ hai lần” chỉ vì khoản tiền đang giữ.
+5. **Thiếu dữ liệu hoặc tool lỗi:** không tự đánh dấu xác thực đạt, không bịa trạng thái giữ/khoá/chuyển người thành công. Báo phần chưa xác nhận được và chuyển hỗ trợ; không dùng lời trấn an thay kết quả hệ thống.
+
+### 4.6. Thử mức đã đặt trên ba kịch bản
+
+Đây là **đối chiếu thiết kế theo kịch bản**, không phải kết quả kiểm thử hệ thống thật. Prototype hiện mock ca #4 và #5; #11 mới được phân tích trên giấy.
+
+| Kịch bản | Luồng theo mức tự chủ | Cái sai ở §2 có bị chặn? | Có việc làm khi lẽ ra phải hỏi? | Chi phí chờ và điểm còn lại |
+|---|---|---|---|---|
+| #4 — Bị lừa đòi nhả 48,5 triệu | AI giữ, cảnh báo, tự chuyển ưu tiên; không nhả dù khuôn mặt đúng. Tư vấn viên gọi lại, kiểm tra bối cảnh; nếu khách muốn khoá ví thì cần chính chủ xác nhận. | Chặn đường **AI tự nhả sau xác thực**. Chưa bảo đảm chặn mọi lừa đảo: tư vấn viên vẫn có thể đánh giá sai hoặc khách che giấu việc bị hướng dẫn. | Không được tự khoá ví hoặc coi lời “nhả ngay” là phê duyệt hợp lệ. | Chờ người là cái giá chấp nhận để tránh mất tiền không đảo được. Quá hạn/ngoài giờ vẫn giữ và báo đúng tình trạng. |
+| #5 — Viện phí 12,8 triệu | AI gửi xác thực ngay, chuyển ưu tiên kèm bằng chứng; tư vấn viên đối chiếu rồi duyệt và xác nhận cuối. | Chặn AI chiều khách tự nhả; giảm vòng hỏi không cần thiết. **Chưa loại bỏ hoàn toàn lỗi chậm thanh toán** vì vẫn phụ thuộc người duyệt. | Muốn khoá ví phải hỏi; khách đổi sang thanh toán khác thì phải cập nhật hồ sơ trước khi nhả. Không suy ra đồng ý thanh toán từ kết quả xác thực. | Mốc 3 phút kích hoạt xử lý quá hạn, không bảo đảm kết thúc chờ. Đường lui cần kiểm soát giao dịch cũ để tránh trả trùng. |
+| #11 — Nạp điện thoại 50 nghìn | AI gửi xác thực, chuyển hàng thông thường, tư vấn viên kiểm tra giao dịch rồi duyệt; không khoá ví. | Chặn khoá ví vô cớ và thông báo chờ mơ hồ; vẫn không tự nhả chỉ vì khoản nhỏ. | Không yêu cầu xác nhận khoá khi khách chỉ cần xử lý nạp tiền; không tự tạo giao dịch mới. | **Vẫn có thời gian chờ và tải hỗ trợ**, là hạn chế nhóm chấp nhận. Hết 3 phút cập nhật tình trạng, không nâng thành ca khẩn chỉ vì thời gian chờ. |
+
+### 4.7. Lời hứa thay đổi và điểm cần đồng bộ prototype
+
+Từ **“AI gỡ chặn giao dịch cho bạn”** đổi thành:
+
+> **“Trợ lý hỗ trợ kiểm tra và chuyển yêu cầu duyệt; chỉ tư vấn viên có quyền nhả giao dịch. Trong giờ trực 8h–20h, nếu sau 3 phút chưa có quyết định, yêu cầu sẽ được chuyển xử lý quá hạn và bạn được thông báo bước tiếp theo. Ngoài giờ trực, trợ lý sẽ báo rõ thời gian hỗ trợ.”**
+
+Lời hứa này phân biệt **quyền quyết định**, **mốc xử lý quá hạn** và **thời điểm hoàn tất**; không hứa tiền luôn an toàn nếu chưa có trạng thái hệ thống xác nhận.
+
+**Bàn giao cho phần §3, §5 và §6:** bản prototype hiện có hai màn, checklist và xác nhận cuối; chưa chứng minh các cơ chế thực thi thật. Cần đồng bộ câu “tối đa 3 phút” thành mốc xử lý quá hạn, sửa lời bảo đảm không trừ hai lần, bổ sung trạng thái ngoài giờ và lựa chọn đã thanh toán bằng cách khác. Bộ đếm hiện tại chỉ hiển thị thời gian, chưa tự xử lý quá hạn; phân quyền phía máy chủ và nhật ký duyệt thật cũng chưa được triển khai. Các luật bổ sung ở §4 là yêu cầu thiết kế, không được ghi là chức năng đã kiểm thử đạt.
 
 ---
 
